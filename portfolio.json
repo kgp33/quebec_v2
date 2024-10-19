@@ -1,0 +1,44 @@
+{
+    "stocks": [
+        {
+            "ticker": "AAPL",
+            "date": "2024-10-10",
+            "amount_in_dollars": 5000.00
+        },
+        {
+            "ticker": "MSFT",
+            "date": "2024-10-10",
+            "amount_in_dollars": 4000.00
+        },
+        {
+            "ticker": "GOOGL",
+            "date": "2024-10-10",
+            "amount_in_dollars": 3500.00
+        },
+        {
+            "ticker": "AMZN",
+            "date": "2024-10-10",
+            "amount_in_dollars": 4500.00
+        },
+        {
+            "ticker": "TSLA",
+            "date": "2024-10-10",
+            "amount_in_dollars": 3000.00
+        },
+        {
+            "ticker": "NVDA",
+            "date": "2024-10-10",
+            "amount_in_dollars": 2500.00
+        },
+        {
+            "ticker": "AAPL",
+            "date": "2024-10-12",
+            "amount_in_dollars": 5000.00
+        },
+        {
+            "ticker": "INVALIDTICKER",
+            "date": "2024-10-10",
+            "amount_in_dollars": 4000.00
+        }
+    ]
+}

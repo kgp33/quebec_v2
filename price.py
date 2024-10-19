@@ -1,5 +1,6 @@
 import yfinance as yf
 from datetime import datetime, timedelta
+import json
 
 
 def get_historical_stock_price(ticker, purchase_date):
@@ -57,7 +58,7 @@ def calculate_investment_value(ticker, purchase_date, investment_amount):
     initial_price = get_historical_stock_price(ticker, purchase_date)
 
     if initial_price == None:
-        return "No data available for the specified purchase date."
+        return "Invalid date or ticker"
 
     current_price = get_current_stock_price(ticker)
 
@@ -67,12 +68,53 @@ def calculate_investment_value(ticker, purchase_date, investment_amount):
     return current_value
 
 
-# Ex usage
-ticker = input("Enter stock ticker (AAPL): ")
-purchase_date = input("Enter the purchase date (YYYY-MM-DD): ")
-investment_amount = float(input("Enter the investment amount: "))
+def load_portfolio(filename):
+    """
+    Loads the portfolio from a JSON file.
 
-current_value = calculate_investment_value(
-    ticker, purchase_date, investment_amount)
+    Parameters:
+        filename (str): The file path of the portfolio JSON.
 
-print("Current value of the porfolio is: " + str(current_value))
+    Returns:
+        dict: The loaded portfolio data.
+    """
+    with open(filename, 'r') as f:
+        portfolio = json.load(f)
+    return portfolio
+
+
+def calculate_total_portfolio_value(portfolio):
+    """
+    Calculates the total current value of all stocks in the portfolio.
+
+    Parameters:
+        portfolio (dict): A dictionary containing the portfolio data.
+
+    Returns:
+        float: The total value of the portfolio.
+    """
+    total_value = 0
+    for stock in portfolio['stocks']:
+        ticker = stock['ticker']
+        purchase_date = stock['date']
+        investment_amount = stock['amount_in_dollars']
+
+        current_value = calculate_investment_value(
+            ticker, purchase_date, investment_amount)
+
+        if isinstance(current_value, str):
+            print(f"Error calculating value for {ticker}: {current_value}")
+        else:
+            total_value += current_value
+
+    return total_value
+
+
+# Load the portfolio JSON
+portfolio_file = 'portfolio.json'
+portfolio_data = load_portfolio(portfolio_file)
+
+# Calculate total portfolio value
+total_portfolio_value = calculate_total_portfolio_value(portfolio_data)
+
+print("Total value of the portfolio is: $" + str(total_portfolio_value))
