@@ -49,9 +49,10 @@ jobs:
       # Run Safety Scan and Save output to json file
       - name: Run Safety Scan
         run: |
-          safety scan --debug --json --output json --stage production > ./scan-results/safety_output.json || echo "Safety scan failed"
+          safety scan --debug --json --stage production --output json  > ./scan-results/safety_output.json || echo "Safety scan failed"
         env:
           SAFETY_API_KEY: ${{ secrets.SAFETY_API_KEY }}
+          SAFETY_STAGE: production
 
       # Check the contents of the directory to verify the file is created
       - name: Verify the scan-results directory
