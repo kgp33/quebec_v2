@@ -64,6 +64,7 @@ jobs:
           else
             echo "No issues found."
             echo "issues_found=false" >> $GITHUB_ENV
+          fi
         continue-on-error: true
 
       # Convert Safety results to SARIF if issues exist
