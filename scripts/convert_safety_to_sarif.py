@@ -38,8 +38,8 @@ def convert_safety_to_sarif(safety_json, sarif_file):
     issues = safety_data.get('vulnerabilities', safety_data.get('issues', []))
 
     if not issues:
-        print("No issues found in the Safety JSON. Exiting.")
-        sys.exit(1)
+        print("No issues found in the Safety JSON. Skipping SARIF conversion.")
+        sys.exit(0)
 
     for issue in safety_data.get('vulnerabilities', []):
         #want to handle issues with data appropriately
