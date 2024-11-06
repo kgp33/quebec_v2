@@ -62,7 +62,7 @@ jobs:
           echo "Conversion complete."
 
       # Debug the directory contents to ensure the SARIF file exists
-      - name: Debug: Check contents of ./scan-results
+      - name: Debug: Check contents of scan-results directory
         run: |
           echo "Checking directory contents"
           ls -la ./scan-results
