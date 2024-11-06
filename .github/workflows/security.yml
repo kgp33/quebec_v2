@@ -54,28 +54,29 @@ jobs:
           SAFETY_API_KEY: ${{ secrets.SAFETY_API_KEY }}
           SAFETY_STAGE: production
 
-      # Convert Safety results to SARIF
+       # Check if there are any issues in the Safety scan results
+      - name: Check if issues exist in the Safety JSON
+        id: check_issues
+        run: |
+          if jq '.scan_results.projects[].files[].results.dependencies | length > 0' ./scan-results/safety_output.json; then
+            echo "Issues found."
+            echo "issues_found=true" >> $GITHUB_ENV
+          else
+            echo "No issues found."
+            echo "issues_found=false" >> $GITHUB_ENV
+          fi
+
+      # Convert Safety results to SARIF if issues exist
       - name: Convert Safety results to SARIF
+        if: env.issues_found == 'true'
         run: |
           echo "Converting safety_output.json to SARIF"
           python scripts/convert_safety_to_sarif.py ./scan-results/safety_output.json ./scan-results/safety_output.sarif
           echo "Conversion complete."
 
-      # Check if SARIF file exists and set an output variable
-      - name: Check if SARIF file exists
-        id: check_sarif
-        run: |
-          if [ -f ./scan-results/safety_output.sarif ]; then
-            echo "SARIF file exists."
-            echo "file_exists=true" >> $GITHUB_ENV
-          else
-            echo "SARIF file does not exist."
-            echo "file_exists=false" >> $GITHUB_ENV
-          fi
-
       # Upload Safety results to Code Scanning Alerts if SARIF file exists
       - name: Upload Safety results to Code Scanning Alerts
-        if: env.file_exists == 'true'
+        if: env.issues_found == 'true'
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: ./scan-results/safety_output.sarif
@@ -84,5 +85,5 @@ jobs:
 
       # If no issues were found, print a message (optional)
       - name: No issues found, skipping conversion
-        if: env.file_exists == 'false'
+        if: env.issues_found == 'false'
         run: echo "No issues were found, skipping SARIF conversion."
