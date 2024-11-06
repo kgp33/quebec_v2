@@ -67,12 +67,11 @@ jobs:
           echo "Conversion complete."
         #continue even if no issues are found
         continue-on-error: true
-        if: success() && steps.safety_scan.outputs.found_issues == 'true'
 
       # Upload the SARIF file if it exists
       - name: Upload Safety results to Code Scanning Alerts
         #only run if SARIF file exists
-        if: success() && exists('./scan-results/safety_output.sarif')
+        if: success() && fileExists('./scan-results/safety_output.sarif')
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: ./scan-results/safety_output.sarif
@@ -82,5 +81,5 @@ jobs:
 
       #tell me if no issues were found
       - name: No issues found, skipping conversion
-        if: success() && steps.safety_scan.outputs.found_issues == 'false'
-        run: echo "No issues were found, skipping conversion."
+        if: success() && !fileExists('./scan-results/safety_output.sarif')
+        run: echo "No issues were found, skipping SARIF conversion."
