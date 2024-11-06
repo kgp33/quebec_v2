@@ -23,8 +23,8 @@ jobs:
       - name: Bandit Scan
         uses: shundor/python-bandit-scan@9cc5aa4a006482b8a7f91134412df6772dbda22c
         with:
-          exit_zero: true # exit with 0, even with results found
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information.
+          exit_zero: true
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # Install Safety
       - name: Install Safety
@@ -65,21 +65,18 @@ jobs:
           echo "Converting safety_output.json to SARIF"
           python scripts/convert_safety_to_sarif.py ./scan-results/safety_output.json ./scan-results/safety_output.sarif
           echo "Conversion complete."
-        #continue even if no issues are found
-        continue-on-error: true
+        continue-on-error: true  # This allows the workflow to continue even if no issues are found
 
       # Upload the SARIF file if it exists
       - name: Upload Safety results to Code Scanning Alerts
-        #only run if SARIF file exists
-        if: success() && fileExists('./scan-results/safety_output.sarif')
+        if: success() && ${{ runner.os == 'Linux' && 'test -f ./scan-results/safety_output.sarif' }}
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: ./scan-results/safety_output.sarif
-          checkout_path: /home/runner/work/quebec_v2/quebec_v2
           token: ${{ secrets.GITHUB_TOKEN }}
           wait-for-processing: true
 
-      #tell me if no issues were found
+      # Tell me if no issues were found
       - name: No issues found, skipping conversion
-        if: success() && !fileExists('./scan-results/safety_output.sarif')
+        if: success() && ${{ runner.os == 'Linux' && 'test ! -f ./scan-results/safety_output.sarif' }}
         run: echo "No issues were found, skipping SARIF conversion."
