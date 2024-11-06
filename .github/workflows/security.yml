@@ -59,7 +59,7 @@ jobs:
         run: |
           ls -la ./scan-results
 
-      # Convert and Upload Safety results to SARIF
+      # Convert Safety results to SARIF
       - name: Convert and Upload Safety results to SARIF
         if: success() # Ensure this step runs only if the previous steps succeed
         run: |
@@ -68,7 +68,10 @@ jobs:
           echo "Conversion complete."
 
       # Upload the SARIF file
-      - name: Upload Safety results to Code Scanning Alerts
+        if: exists('./scan-results/safety_output.sarif')  # Only run this step if the SARIF file exists
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: ./scan-results/safety_output.sarif
+          checkout_path: /home/runner/work/quebec_v2/quebec_v2
+          token: ${{ secrets.GITHUB_TOKEN }}
+          wait-for-processing: true
