@@ -61,13 +61,6 @@ jobs:
           python scripts/convert_safety_to_sarif.py ./scan-results/safety_output.json ./scan-results/safety_output.sarif
           echo "Conversion complete."
 
-      # Debug the directory contents to ensure the SARIF file exists
-      - name: Debug: Check contents of scan-results directory
-        run: |
-          echo "Checking directory contents"
-          ls -la ./scan-results
-        continue-on-error: true
-
       # Check if SARIF file exists and set an output variable
       - name: Check if SARIF file exists
         id: check_sarif
