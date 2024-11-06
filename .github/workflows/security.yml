@@ -74,14 +74,6 @@ jobs:
           python scripts/convert_safety_to_sarif.py ./scan-results/safety_output.json ./scan-results/safety_output.sarif
           echo "Conversion complete."
 
-      # Convert Safety results to SARIF if issues exist
-      - name: Convert Safety results to SARIF
-        if: env.issues_found == 'true'
-        run: |
-          echo "Converting safety_output.json to SARIF"
-          python scripts/convert_safety_to_sarif.py ./scan-results/safety_output.json ./scan-results/safety_output.sarif
-          echo "Conversion complete."
-
       # Upload Safety results to Code Scanning Alerts if SARIF file exists
       - name: Upload Safety results to Code Scanning Alerts
         if: env.issues_found == 'true'
