@@ -54,17 +54,25 @@ jobs:
           SAFETY_API_KEY: ${{ secrets.SAFETY_API_KEY }}
           SAFETY_STAGE: production
 
-       # Check if there are any issues in the Safety scan results
+      # Check if issues exist in the Safety JSON
       - name: Check if issues exist in the Safety JSON
         id: check_issues
         run: |
-          if jq '.scan_results.projects[].files[].results.dependencies | length > 0' ./scan-results/safety_output.json; then
+          if jq '.scan_results.projects[].files[].results.dependencies[]? | .vulnerabilities.known_vulnerabilities | length > 0' ./scan-results/safety_output.json; then
             echo "Issues found."
             echo "issues_found=true" >> $GITHUB_ENV
           else
             echo "No issues found."
             echo "issues_found=false" >> $GITHUB_ENV
-          fi
+        continue-on-error: true
+
+      # Convert Safety results to SARIF if issues exist
+      - name: Convert Safety results to SARIF
+        if: env.issues_found == 'true'
+        run: |
+          echo "Converting safety_output.json to SARIF"
+          python scripts/convert_safety_to_sarif.py ./scan-results/safety_output.json ./scan-results/safety_output.sarif
+          echo "Conversion complete."
 
       # Convert Safety results to SARIF if issues exist
       - name: Convert Safety results to SARIF
