@@ -54,29 +54,42 @@ jobs:
           SAFETY_API_KEY: ${{ secrets.SAFETY_API_KEY }}
           SAFETY_STAGE: production
 
-      # Check the contents of the directory to verify the file is created
-      - name: Verify the scan-results directory
-        run: |
-          ls -la ./scan-results
-
-      # Convert Safety results to SARIF if issues are found
+      # Convert Safety results to SARIF
       - name: Convert Safety results to SARIF
         run: |
           echo "Converting safety_output.json to SARIF"
           python scripts/convert_safety_to_sarif.py ./scan-results/safety_output.json ./scan-results/safety_output.sarif
           echo "Conversion complete."
-        continue-on-error: true  # This allows the workflow to continue even if no issues are found
 
-      # Check if SARIF file exists and upload if it does
+      # Debug the directory contents to ensure the SARIF file exists
+      - name: Debug: Check contents of ./scan-results
+        run: |
+          echo "Checking directory contents"
+          ls -la ./scan-results
+        continue-on-error: true
+
+      # Check if SARIF file exists and set an output variable
+      - name: Check if SARIF file exists
+        id: check_sarif
+        run: |
+          if [ -f ./scan-results/safety_output.sarif ]; then
+            echo "SARIF file exists."
+            echo "file_exists=true" >> $GITHUB_ENV
+          else
+            echo "SARIF file does not exist."
+            echo "file_exists=false" >> $GITHUB_ENV
+          fi
+
+      # Upload Safety results to Code Scanning Alerts if SARIF file exists
       - name: Upload Safety results to Code Scanning Alerts
-        if: success() && ${{ steps.convert_safety.outputs.sarif_exists == 'true' }}
+        if: env.file_exists == 'true'
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: ./scan-results/safety_output.sarif
           token: ${{ secrets.GITHUB_TOKEN }}
           wait-for-processing: true
 
-      # Check for no issues found and skip conversion
+      # If no issues were found, print a message (optional)
       - name: No issues found, skipping conversion
-        if: success() && ${{ steps.convert_safety.outputs.sarif_exists == 'false' }}
+        if: env.file_exists == 'false'
         run: echo "No issues were found, skipping SARIF conversion."
