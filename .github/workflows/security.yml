@@ -85,6 +85,7 @@ jobs:
           else
             echo "SARIF file does not exist."
             echo "sarif_file_exists=false" >> $GITHUB_ENV
+          fi
         continue-on-error: true
 
       # Upload Safety results to Code Scanning Alerts if SARIF file exists
