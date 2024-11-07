@@ -49,7 +49,7 @@ jobs:
       # Run Safety Scan and Save output to json file
       - name: Run Safety Scan
         run: |
-          safety scan --debug --json --stage production --output json  > ./scan-results/safety_output.json
+          safety scan --debug --json --output json  > ./scan-results/safety_output.json
         env:
           SAFETY_API_KEY: ${{ secrets.SAFETY_API_KEY }}
           SAFETY_STAGE: production
