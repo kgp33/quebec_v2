@@ -148,7 +148,9 @@ def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
                     "properties": {
                         "severity": vuln['severity']
                     },
-                    "fingerprints": [fingerprint]
+                    "fingerprints": [
+                        {"primary": fingerprint}
+                    ]   
                 })
         else:
             print(f"Package '{package_name}' is not in the requirements.txt. Skipping SARIF entry.")
