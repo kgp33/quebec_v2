@@ -68,6 +68,7 @@ def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
                 for specification in dependency.get('specifications', []):
                     #extract package
                     raw_spec = specification.get('raw', None)
+                    print(f"*******{raw_spec}******")
                     if not raw_spec:
                         print(f"Skipping dependency {dependency.get('name', 'Unknown')} because raw_spec is missing.")
                         continue
@@ -99,7 +100,7 @@ def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
                                 print(f"Skipping vulnerability for {package_name} due to missing package version.")
 
                     else:
-                        print(f"Raw spec not found for dependency: {dependency.get('name', 'Unknown')}")
+                        print(f"No vulnerabilities found for {dependency.get('name', 'Unknown')}")
 
     if not vulns:
         print("No vulnerabilities found in the Safety JSON. Skipping SARIF conversion.")
