@@ -13,13 +13,14 @@ def load_requirements(requirements_file):
 
 def find_files_for_package(package_name, source_dir="src"):
     matched_files = []
+    package_name = package_name.lower()
     # Traverse the source directory
     for root, subdirs, files in os.walk(source_dir):
         for file in files:
             if file.endswith(".py"):  # Look for Python files
                 with open(os.path.join(root, file), 'r') as f:
                     content = f.read()
-                    if package_name in content:  # Search for import of the package
+                    if f"import {package_name}" in content.lower() or f"from {package_name} import" in content.lower():  # Search for import of the package
                         matched_files.append(os.path.relpath(os.path.join(root, file)))
     return matched_files
 
