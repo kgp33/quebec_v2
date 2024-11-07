@@ -41,10 +41,11 @@ def convert_safety_to_sarif(safety_json, sarif_file):
         for file in project.get('files', []):
             for dependency in file.get('results', {}).get('dependencies', []):
                 #get the known vulnerabilities for each dependency
-                known_vulnerabilities = dependency.get('vulnerabilities', {}).get('known_vulnerabilities', [])
+                for specification in dependency.get('specifications', []):
+                    known_vulnerabilities = specification.get('vulnerabilities', {}).get('known_vulnerabilities', [])
                 
-                if known_vulnerabilities:
-                    vulns.extend(known_vulnerabilities)
+                    if known_vulnerabilities:
+                        vulns.extend(known_vulnerabilities)
 
     if not vulns:
         print("No vulnerabilities found in the Safety JSON. Skipping SARIF conversion.")
