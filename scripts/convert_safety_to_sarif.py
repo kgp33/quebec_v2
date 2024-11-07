@@ -68,12 +68,15 @@ def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
                 for specification in dependency.get('specifications', []):
                     #extract package
                     raw_spec = specification.get('raw', None)
-                    if raw_spec:
-                        try:
-                            package_name, package_version = raw_spec.split('==')
-                        except ValueError as e:
-                            print(f"Error splitting raw spec: {raw_spec}. Error: {str(e)}")
-                            continue
+                    if not raw_spec:
+                        print(f"Skipping dependency {dependency.get('name', 'Unknown')} because raw_spec is missing.")
+                        continue
+
+                    try:
+                        package_name, package_version = raw_spec.split('==')
+                    except ValueError as e:
+                        print(f"Error splitting raw spec: {raw_spec}. Error: {str(e)}")
+                        continue
                     
                     known_vulnerabilities = specification.get('vulnerabilities', {}).get('known_vulnerabilities', [])
                     if known_vulnerabilities:
@@ -97,17 +100,23 @@ def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
 
                     else:
                         print(f"Raw spec not found for dependency: {dependency.get('name', 'Unknown')}")
-                        continue  # Skip if no raw_spec is available for the package
 
     if not vulns:
         print("No vulnerabilities found in the Safety JSON. Skipping SARIF conversion.")
         sys.exit(0)
+    else:
+        print(f"{len(vulns)} vulnerabilities found.")
 
     for vuln in vulns:
         print(f"Processing vulnerability: {vuln}")
 
         if f"{vuln['package_name']}=={vuln['package_version']}" in dependencies:
+            print("Dependencies from requirements.txt:", dependencies)
             matched_files = find_files_for_package(vuln['package_name'], source_dir="src")
+            if not matched_files:
+                print(f"No Python files found that import {vuln['package_name']}.")
+            else:
+                print(f"Found {len(matched_files)} files that import {vuln['package_name']}.")
 
             #converting the results of safety scan to sarif format
             for matched_file in matched_files:
