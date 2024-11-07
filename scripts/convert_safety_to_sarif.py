@@ -1,7 +1,29 @@
 import json
 import sys
+import os
 
-def convert_safety_to_sarif(safety_json, sarif_file):
+def load_requirements(requirements_file):
+    with open(requirements_file, 'r') as f:
+        lines = f.readlines()
+    return [
+        line.strip()
+        for line in lines
+        if line.strip()
+    ]
+
+def find_files_for_package(package_name, source_dir="src"):
+    matched_files = []
+    # Traverse the source directory
+    for root, subdirs, files in os.walk(source_dir):
+        for file in files:
+            if file.endswith(".py"):  # Look for Python files
+                with open(os.path.join(root, file), 'r') as f:
+                    content = f.read()
+                    if package_name in content:  # Search for import of the package
+                        matched_files.append(os.path.relpath(os.path.join(root, file)))
+    return matched_files
+
+def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
     #read json results of safety scan from workflow
     try:
         with open(safety_json, 'r') as f:
@@ -14,6 +36,8 @@ def convert_safety_to_sarif(safety_json, sarif_file):
     except json.JSONDecodeError:
         print(f"Error: Failed to decode JSON from {safety_json}.")
         sys.exit(1)
+
+    dependencies = load_requirements(requirements_file)
     
     #just want to see the json data
     print("Safety JSON structure:", safety_data)
@@ -63,32 +87,31 @@ def convert_safety_to_sarif(safety_json, sarif_file):
         #placeholder for line number if available in the issue data
         start_line = vuln.get('line', 1)
 
-        uri_value = package_name
-        if uri_value == "Unknown package":
-            uri_value = "None"
+        matched_files = find_files_for_package(package_name, source_dir="src")
     
         #converting the results of safety scan to sarif format
-        sarif_data['runs'][0]['results'].append({
-            "ruleId": rule_id,
-            "message": {
-                "text": description
-            },
-            "locations": [
-                {
-                    "physicalLocation": {
-                        "artifactLocation": {
-                            "uri": uri_value
-                        },
-                        "region": {
-                            "startLine": start_line
+        for matched_file in matched_files:
+            sarif_data['runs'][0]['results'].append({
+                "ruleId": rule_id,
+                "message": {
+                    "text": description
+                },
+                "locations": [
+                    {
+                        "physicalLocation": {
+                            "artifactLocation": {
+                                "uri": uri_value
+                            },
+                            "region": {
+                                "startLine": matched_file
+                            }
                         }
                     }
+                ],
+                "properties": {
+                    "severity": severity
                 }
-            ],
-            "properties": {
-                "severity": severity
-            }
-        })
+            })
     
     #write the data into the the sarif file that will get uploaded
     try:
@@ -108,6 +131,7 @@ if __name__ == "__main__":
     #get input and output file paths
     safety_json = sys.argv[1]
     sarif_file = sys.argv[2]
+    requirements_file = sys.argv[3]
     
     #run the function
-    convert_safety_to_sarif(safety_json, sarif_file)
+    convert_safety_to_sarif(safety_json, sarif_file, requirements_file)
