@@ -62,6 +62,10 @@ def convert_safety_to_sarif(safety_json, sarif_file):
 
         #placeholder for line number if available in the issue data
         start_line = vuln.get('line', 1)
+
+        uri_value = package_name
+        if uri_value == "Unknown package":
+            uri_value = "None"
     
         #converting the results of safety scan to sarif format
         sarif_data['runs'][0]['results'].append({
@@ -73,7 +77,7 @@ def convert_safety_to_sarif(safety_json, sarif_file):
                 {
                     "physicalLocation": {
                         "artifactLocation": {
-                            "uri": package_name
+                            "uri": uri_value
                         },
                         "region": {
                             "startLine": start_line
