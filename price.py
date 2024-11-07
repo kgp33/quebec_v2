@@ -129,7 +129,6 @@ portfolio_data = validated_portfolio
 
 if validated_portfolio:
     # Extract tickers from the validated portfolio
-    #tickers = [stock['ticker'] for stock in portfolio_data]
     tickers = [stock['ticker'] for stock in validated_portfolio]
     
     # Fetch historical price data for the tickers
@@ -154,3 +153,15 @@ else:
 # test_data = yf.download(tickers, period='1y', progress=False)['Close']
 # test_data.to_json('test_data.json')
 
+#code to read in unit test data
+#test_data = pd.read_json('test_data.json')
+
+# Calculate the unit test data total portfolio value on today
+#total_test_portfolio_value = calculate_total_portfolio_value(
+#    portfolio_data, test_data, '2024-11-04')
+#print("Total value of the test portfolio today is: " + str(total_test_portfolio_value))
+
+# Calculate test data sharpe ratio
+#test_sharpe_ratio = fetch_portfolio_sharpe_ratio(
+#    portfolio_data, test_data, total_test_portfolio_value)
+#print("Sharpe ratio of the test portfolio is: " + str(test_sharpe_ratio))
