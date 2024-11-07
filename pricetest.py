@@ -26,7 +26,7 @@ def test_calculate_total_portfolio_value(price_data):
     tolerance = 0.01
 
     # Test the portfolio value function
-    calculated_total_portfolio_value = calculate_total_portfolio_value(portfolio_data, price_data)
+    calculated_total_portfolio_value = calculate_total_portfolio_value(portfolio_data, price_data, '2024-11-04')
 
     assert calculated_total_portfolio_value is not None, "Failed to calculate Portfolio Value"
     assert abs(calculated_total_portfolio_value - expected_portfolio_value) <= tolerance, \
@@ -41,7 +41,7 @@ def test_fetch_portfolio_sharpe_ratio(price_data):
     # Load the portfolio JSON
     portfolio_file = 'portfolio.json'
     portfolio_data = load_portfolio(portfolio_file)
-    total_investment = calculate_total_portfolio_value(portfolio_data, price_data)
+    total_investment = calculate_total_portfolio_value(portfolio_data, price_data, '2024-11-04')
 
     # Define the expected Sharpe Ratio and tolerance
     expected_sharpe_ratio = 0.109  # Replace this with your expected value

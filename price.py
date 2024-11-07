@@ -161,7 +161,3 @@ else:
 #    portfolio_data, test_data, '2024-11-04')
 #print("Total value of the test portfolio today is: " + str(total_test_portfolio_value))
 
-# Calculate test data sharpe ratio
-#test_sharpe_ratio = fetch_portfolio_sharpe_ratio(
-#    portfolio_data, test_data, total_test_portfolio_value)
-#print("Sharpe ratio of the test portfolio is: " + str(test_sharpe_ratio))
