@@ -104,7 +104,7 @@ def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
                                 "uri": uri_value
                             },
                             "region": {
-                                "startLine": matched_file
+                                "startLine": start_line
                             }
                         }
                     }
