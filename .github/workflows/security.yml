@@ -68,10 +68,10 @@ jobs:
         continue-on-error: true
 
       # Debug step: List scan-results directory to verify output
-      - name: Debug: List scan-results directory
+      - name: List scan-results directory
         run: |
           echo "Listing contents of ./scan-results:"
-          ls -l ./scan-results
+          ls -l ./scan-results || echo "No files found in ./scan-results"
 
       # Convert Safety results to SARIF if issues exist
       - name: Convert Safety results to SARIF
@@ -81,11 +81,15 @@ jobs:
           python scripts/convert_safety_to_sarif.py ./scan-results/safety_output.json ./scan-results/safety_output.sarif || echo "SARIF conversion failed"
           echo "Conversion complete."
 
-      # Debug step: Check if SARIF file was created
-      - name: Debug: Check if SARIF file was created
+      # Debug step: Check if SARIF file was created.
+      - name: Check if SARIF file was created
         run: |
           echo "Checking for SARIF file..."
-          ls -l ./scan-results
+          if [ -f ./scan-results/safety_output.sarif ]; then
+            echo "SARIF file found."
+          else
+            echo "SARIF file not found."
+          fi
 
       # Check if the SARIF file exists before uploading it
       - name: Check if SARIF file exists
