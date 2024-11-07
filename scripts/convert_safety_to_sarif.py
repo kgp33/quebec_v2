@@ -88,33 +88,36 @@ def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
         #placeholder for line number if available in the issue data
         start_line = vuln.get('line', 1)
 
-        matched_files = find_files_for_package(package_name, source_dir="src")
-    
+        if package_name.lower() in dependencies:
+            matched_files = find_files_for_package(package_name, source_dir="src")
+
         #converting the results of safety scan to sarif format
-        for matched_file in matched_files:
-            uri_value = f"file://{os.path.abspath(matched_file)}"
-            sarif_data['runs'][0]['results'].append({
-                "ruleId": rule_id,
-                "message": {
-                    "text": description
-                },
-                "locations": [
-                    {
-                        "physicalLocation": {
-                            "artifactLocation": {
-                                "uri": uri_value
-                            },
-                            "region": {
-                                "startLine": start_line
+            for matched_file in matched_files:
+                uri_value = f"file://{os.path.abspath(matched_file)}"
+                sarif_data['runs'][0]['results'].append({
+                    "ruleId": rule_id,
+                    "message": {
+                        "text": description
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": uri_value
+                                },
+                                "region": {
+                                    "startLine": start_line
+                                }
                             }
                         }
-                    }
-                ],
-                "properties": {
-                    "severity": severity
-                },
-                "packageName": package_name
-            })
+                    ],
+                    "properties": {
+                        "severity": severity
+                    },
+                    "packageName": package_name
+                })
+        else:
+            print(f"Package '{package_name}' is not in the requirements.txt. Skipping SARIF entry.")
     
     #write the data into the the sarif file that will get uploaded
     try:
