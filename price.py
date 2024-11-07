@@ -83,22 +83,6 @@ def fetch_portfolio_sharpe_ratio(portfolio, price_data, total_investment, risk_f
         print(f"Error fetching historical prices for portfolio: {e}")
         return None
 
-'''
-def load_portfolio(filename):
-    """
-    Loads the portfolio from a JSON file.
-
-    Parameters:
-        filename (str): The file path of the portfolio JSON.
-
-    Returns:
-        dict: The loaded portfolio data.
-    """
-    with open(filename, 'r') as f:
-        portfolio = json.load(f)
-    return portfolio
-'''
-
 def calculate_total_portfolio_value(portfolio, price_data, Date=datetime.today().strftime('%Y-%m-%d')):
     """
     Calculates the total current value of all stocks in the portfolio on the specific day.
@@ -164,25 +148,9 @@ if validated_portfolio:
 else:
     print("Portfolio validation failed. Cannot calculate total value.")
 
-'''
-# Load the portfolio JSON
-portfolio_file = 'portfolio.json'
-portfolio_data = load_portfolio(portfolio_file)
 
-tickers = pd.DataFrame(portfolio_data)['ticker'].to_list()
-price_data = yf.download(tickers, period='1y', progress=False)['Close']
 
 # code to generate test_data.json
 # test_data = yf.download(tickers, period='1y', progress=False)['Close']
 # test_data.to_json('test_data.json')
 
-# Calculate total portfolio value on today
-total_portfolio_value = calculate_total_portfolio_value(
-    portfolio_data, price_data)
-print("Total value of the portfolio today is: " + str(total_portfolio_value))
-
-# Calculate sharpe ratio
-sharpe_ratio = fetch_portfolio_sharpe_ratio(
-    portfolio_data, price_data, total_portfolio_value)
-print("Sharpe ratio of the portfolio is: " + str(sharpe_ratio))
-'''
