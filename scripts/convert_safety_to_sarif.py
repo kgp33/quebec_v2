@@ -91,6 +91,7 @@ def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
     
         #converting the results of safety scan to sarif format
         for matched_file in matched_files:
+            uri_value = f"file://{os.path.abspath(matched_file)}"
             sarif_data['runs'][0]['results'].append({
                 "ruleId": rule_id,
                 "message": {
@@ -111,6 +112,7 @@ def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
                 "properties": {
                     "severity": severity
                 }
+                "packageName": package_name
             })
     
     #write the data into the the sarif file that will get uploaded
