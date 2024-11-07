@@ -81,7 +81,9 @@ def convert_safety_to_sarif(safety_json, sarif_file):
                     }
                 }
             ],
-            "severity": severity
+            "properties": {
+                "severity": severity
+            }
         })
     
     #write the data into the the sarif file that will get uploaded
