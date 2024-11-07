@@ -124,8 +124,8 @@ def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
 
 if __name__ == "__main__":
     #confirm number of arguments
-    if len(sys.argv) != 3:
-        print("Usage: python convert_safety_to_sarif.py <input_json> <output_sarif>")
+    if len(sys.argv) != 4:
+        print("Usage: python convert_safety_to_sarif.py <input_json> <output_sarif> <requirements.txt>")
         sys.exit(1)
 
     #get input and output file paths
