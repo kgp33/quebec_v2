@@ -1,6 +1,8 @@
 import json
 import sys
 import os
+import hashlib
+
 
 def load_requirements(requirements_file):
     with open(requirements_file, 'r') as f:
@@ -24,6 +26,11 @@ def find_files_for_package(package_name, source_dir="src"):
                         matched_files.append(os.path.relpath(os.path.join(root, file)))
     return matched_files
 
+def generate_fingerprint(uri, line):
+    # Combine the file path and line number to create a unique fingerprint
+    data = f"{uri}-{line}".encode('utf-8')
+    return hashlib.sha1(data).hexdigest()
+
 def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
     #read json results of safety scan from workflow
     try:
@@ -33,9 +40,6 @@ def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
             print(f"Error: The file {safety_json} was not found.")
     except json.JSONDecodeError:
         print(f"Error: The file {safety_json} was not found.")
-        sys.exit(1)
-    except json.JSONDecodeError:
-        print(f"Error: Failed to decode JSON from {safety_json}.")
         sys.exit(1)
 
     dependencies = load_requirements(requirements_file)
@@ -122,7 +126,8 @@ def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
 
             #converting the results of safety scan to sarif format
             for matched_file in matched_files:
-                uri_value = f"file://{os.path.abspath(matched_file)}"
+                uri_value = os.path.relpath(matched_file, start=os.getcwd())
+                fingerprint = generate_fingerprint(uri_value, vuln['line'])
                 sarif_data['runs'][0]['results'].append({
                     "ruleId": vuln['rule_id'],
                     "message": {
@@ -142,7 +147,8 @@ def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
                     ],
                     "properties": {
                         "severity": vuln['severity']
-                    }
+                    },
+                    "fingerprints": [fingerprint]
                 })
         else:
             print(f"Package '{package_name}' is not in the requirements.txt. Skipping SARIF entry.")
