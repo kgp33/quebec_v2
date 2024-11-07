@@ -111,7 +111,7 @@ def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
                 ],
                 "properties": {
                     "severity": severity
-                }
+                },
                 "packageName": package_name
             })
     
