@@ -113,8 +113,8 @@ def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
         print(f"Processing vulnerability: {vuln}")
 
         if f"{vuln['package_name']}=={vuln['package_version']}" in dependencies:
-            print("Dependencies from requirements.txt:", dependencies)
-            matched_files = find_files_for_package(vuln['package_name'], source_dir="src")
+            #print("Dependencies from requirements.txt:", dependencies)
+            matched_files = find_files_for_package(vuln['package_name'], source_dir=".")
             if not matched_files:
                 print(f"No Python files found that import {vuln['package_name']}.")
             else:
