@@ -110,7 +110,7 @@ jobs:
 
       # Upload Safety results to Code Scanning Alerts if SARIF file exists
       - name: Upload Safety results to Code Scanning Alerts
-        if: env.sarif_file_exists == 'true'
+        if: $ {{ env.sarif_file_exists == 'true' }}
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: ./scan-results/safety_output.sarif
@@ -119,5 +119,5 @@ jobs:
 
       # If no issues were found, print a message (optional)
       - name: No vulnerabilities found, skipping conversion
-        if: env.Vulnerabilities_found == 'false'
+        if: ${{ env.Vulnerabilities_found == 'false' }}
         run: echo "No vulnerabilities were found, skipping SARIF conversion."

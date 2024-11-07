@@ -34,24 +34,33 @@ def convert_safety_to_sarif(safety_json, sarif_file):
         ]
     }
 
-    #checking to see if vulnerabilities exists in the safety data
-    issues = safety_data.get('vulnerabilities', safety_data.get('issues', []))
+    vulns = []
 
-    if not issues:
-        print("No issues found in the Safety JSON. Skipping SARIF conversion.")
+    # Traverse through the projects and dependencies to check for vulnerabilities
+    for project in safety_data.get('scan_results', {}).get('projects', []):
+        for file in project.get('files', []):
+            for dependency in file.get('results', {}).get('dependencies', []):
+                #get the known vulnerabilities for each dependency
+                known_vulnerabilities = dependency.get('vulnerabilities', {}).get('known_vulnerabilities', [])
+                
+                if known_vulnerabilities:
+                    vulns.extend(known_vulnerabilities)
+
+    if not vulns:
+        print("No vulnerabilities found in the Safety JSON. Skipping SARIF conversion.")
         sys.exit(0)
 
-    for issue in safety_data.get('vulnerabilities', []):
+    for vuln in vulns:
         #want to handle issues with data appropriately
         #mark rule_id as 'UNKNOWN' if vuln_id is missing
-        rule_id = issue.get('vuln_id', 'UNKNOWN')
-        description = issue.get('description', 'No description available.')
-        package_name = issue.get('package_name', 'Unknown package')
+        rule_id = vuln.get('id', 'UNKNOWN')
+        description = vuln.get('description', 'No description available.')
+        package_name = vuln.get('package_name', 'Unknown package')
         #default to 'LOW' if no severity is provided
-        severity = issue.get('severity', 'LOW').upper()
+        severity = vuln.get('severity', 'LOW').upper()
 
         #placeholder for line number if available in the issue data
-        start_line = issue.get('line', 1)
+        start_line = vuln.get('line', 1)
     
         #converting the results of safety scan to sarif format
         sarif_data['runs'][0]['results'].append({
