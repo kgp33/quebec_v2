@@ -31,7 +31,7 @@ def find_files_for_package(package_name, source_dir="src"):
 def generate_fingerprint(uri, line):
     #combine the file path and line number to create a unique fingerprint (this is required by sarif format)
     data = f"{uri}-{line}".encode('utf-8')
-    return hashlib.sha1(data).hexdigest()
+    return hashlib.sha256(data).hexdigest()
 
 def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
     #read json results of safety scan from workflow
