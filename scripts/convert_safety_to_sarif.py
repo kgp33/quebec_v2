@@ -76,6 +76,7 @@ def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
         sys.exit(0)
 
     for vuln in vulns:
+        print(f"Processing vulnerability: {vuln}")
         #want to handle issues with data appropriately
         #mark rule_id as 'UNKNOWN' if vuln_id is missing
         rule_id = vuln.get('id', 'UNKNOWN')
