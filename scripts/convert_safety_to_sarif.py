@@ -149,7 +149,7 @@ def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
                         "severity": vuln['severity']
                     },
                     "fingerprints": [
-                        {"primary": fingerprint}
+                        "primary": fingerprint
                     ]   
                 })
         else:
