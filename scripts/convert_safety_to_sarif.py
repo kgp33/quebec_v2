@@ -69,13 +69,16 @@ def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
                     #extract package
                     raw_spec = specification.get('raw', None)
                     if raw_spec:
-                        package_name = raw_spec.split('==')[0]
-                        package_version = raw_spec.split('==')[1]
+                        try:
+                            package_name, package_version = raw_spec.split('==')
+                        except ValueError as e:
+                            print(f"Error splitting raw spec: {raw_spec}. Error: {str(e)}")
+                            continue
                     
                     known_vulnerabilities = specification.get('vulnerabilities', {}).get('known_vulnerabilities', [])
                     if known_vulnerabilities:
                         for vuln in known_vulnerabilities:
-                            vulns.append({
+                            vuln_data = {
                                 'id': vuln.get('id', 'UNKNOWN'),
                                 'description': vuln.get('description', 'No description available.'),
                                 'package_name': package_name,
@@ -84,11 +87,17 @@ def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
                                 'line': vuln.get('line', 1),
                                 'vulnerable_spec': vuln.get('vulnerable_spec', ''),
                                 'rule_id': vuln.get('id', 'UNKNOWN'),
-                            })
+                            }
+                            
+                            if package_name and package_version:
+                                vulns.append(vuln_data)
+                                print(f"Processed vulnerability: {vuln_data}")  # Debug output
+                            else:
+                                print(f"Skipping vulnerability for {package_name} due to missing package version.")
 
-
-
-                        vulns.extend(known_vulnerabilities)
+                    else:
+                        print(f"Raw spec not found for dependency: {dependency.get('name', 'Unknown')}")
+                        continue  # Skip if no raw_spec is available for the package
 
     if not vulns:
         print("No vulnerabilities found in the Safety JSON. Skipping SARIF conversion.")
