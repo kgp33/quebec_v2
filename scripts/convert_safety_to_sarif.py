@@ -16,18 +16,20 @@ def load_requirements(requirements_file):
 def find_files_for_package(package_name, source_dir="src"):
     matched_files = []
     package_name = package_name.lower()
-    # Traverse the source directory
+    #go through the source directory
     for root, subdirs, files in os.walk(source_dir):
         for file in files:
-            if file.endswith(".py"):  # Look for Python files
+            #only care about python files
+            if file.endswith(".py"):
                 with open(os.path.join(root, file), 'r') as f:
                     content = f.read()
-                    if f"import {package_name}" in content.lower() or f"from {package_name} import" in content.lower():  # Search for import of the package
+                    #specifically looking for "import" statements
+                    if f"import {package_name}" in content.lower() or f"from {package_name} import" in content.lower():
                         matched_files.append(os.path.relpath(os.path.join(root, file)))
     return matched_files
 
 def generate_fingerprint(uri, line):
-    # Combine the file path and line number to create a unique fingerprint
+    #combine the file path and line number to create a unique fingerprint (this is required by sarif format)
     data = f"{uri}-{line}".encode('utf-8')
     return hashlib.sha1(data).hexdigest()
 
@@ -42,6 +44,7 @@ def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
         print(f"Error: The file {safety_json} was not found.")
         sys.exit(1)
 
+    #we're looking at the requirements file
     dependencies = load_requirements(requirements_file)
     
     #just want to see the json data
@@ -65,7 +68,7 @@ def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
 
     vulns = []
 
-    # Traverse through the projects and dependencies to check for vulnerabilities
+    #traversing through the projects and dependencies to check for vulnerabilities
     for project in safety_data.get('scan_results', {}).get('projects', []):
         for file in project.get('files', []):
             for dependency in file.get('results', {}).get('dependencies', []):
@@ -100,7 +103,7 @@ def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
                             
                             if package_name and package_version:
                                 vulns.append(vuln_data)
-                                print(f"Processed vulnerability: {vuln_data}")  # Debug output
+                                print(f"Processed vulnerability: {vuln_data}")
                             else:
                                 print(f"Skipping vulnerability for {package_name} due to missing package version.")
 
@@ -117,7 +120,6 @@ def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
         print(f"Processing vulnerability: {vuln}")
 
         if f"{vuln['package_name']}=={vuln['package_version']}" in dependencies:
-            #print("Dependencies from requirements.txt:", dependencies)
             matched_files = find_files_for_package(vuln['package_name'], source_dir=".")
             if not matched_files:
                 print(f"No Python files found that import {vuln['package_name']}.")
