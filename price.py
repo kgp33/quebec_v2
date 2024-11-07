@@ -118,7 +118,7 @@ def calculate_total_portfolio_value(portfolio, price_data, Date=datetime.today()
             stock_price = price_data[ticker].loc[Date]
             total_value += nShares * stock_price
         except KeyError as e:
-            print(f"Error fetching current price for {ticker}: {e}")
+            print(f"Error fetching price on {e}")
             return None
     return total_value
 
@@ -137,12 +137,13 @@ price_data = yf.download(tickers, period='1y', progress=False)['Close']
 # Calculate total portfolio value on today
 total_portfolio_value = calculate_total_portfolio_value(
     portfolio_data, price_data)
-print("Total value of the portfolio today is: " + str(total_portfolio_value))
+if total_portfolio_value:
+    print("Total value of the portfolio today is: " + str(total_portfolio_value))
 
-# Calculate sharpe ratio
-sharpe_ratio = fetch_portfolio_sharpe_ratio(
-    portfolio_data, price_data, total_portfolio_value)
-print("Sharpe ratio of the portfolio is: " + str(sharpe_ratio))
+    # Calculate sharpe ratio
+    sharpe_ratio = fetch_portfolio_sharpe_ratio(
+        portfolio_data, price_data, total_portfolio_value)
+    print("Sharpe ratio of the portfolio is: " + str(sharpe_ratio))
 
 
 
