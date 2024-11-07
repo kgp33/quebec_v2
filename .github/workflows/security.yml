@@ -49,7 +49,7 @@ jobs:
       # Run Safety Scan and Save output to json file
       - name: Run Safety Scan
         run: |
-          safety scan --debug --json --stage production --output json  > ./scan-results/safety_output.json || echo "Safety scan failed"
+          safety scan --debug --json --stage production --output json  > ./scan-results/safety_output.json
         env:
           SAFETY_API_KEY: ${{ secrets.SAFETY_API_KEY }}
           SAFETY_STAGE: production
@@ -58,7 +58,7 @@ jobs:
       - name: Check if vulnerabilities exist in the Safety JSON
         id: check_vulns
         run: |
-          if jq '.scan_results.projects[].files[].results.dependencies[]? | .vulnerabilities.known_vulnerabilities | length > 0' ./scan-results/safety_output.json; then
+          if jq '.scan_results.projects[].files[].results.dependencies[]? | select(.vulnerabilities.known_vulnerabilities | length > 0)' ./scan-results/safety_output.json; then
             echo "Vulnerabilities found."
             echo "Vulnerabilities_found=true" >> $GITHUB_ENV
           else
@@ -67,13 +67,25 @@ jobs:
           fi
         continue-on-error: true
 
+      # Debug step: List scan-results directory to verify output
+      - name: Debug: List scan-results directory
+        run: |
+          echo "Listing contents of ./scan-results:"
+          ls -l ./scan-results
+
       # Convert Safety results to SARIF if issues exist
       - name: Convert Safety results to SARIF
         if: env.Vulnerabilities_found == 'true'
         run: |
           echo "Converting safety_output.json to SARIF"
-          python scripts/convert_safety_to_sarif.py ./scan-results/safety_output.json ./scan-results/safety_output.sarif
+          python scripts/convert_safety_to_sarif.py ./scan-results/safety_output.json ./scan-results/safety_output.sarif || echo "SARIF conversion failed"
           echo "Conversion complete."
+
+      # Debug step: Check if SARIF file was created
+      - name: Debug: Check if SARIF file was created
+        run: |
+          echo "Checking for SARIF file..."
+          ls -l ./scan-results
 
       # Check if the SARIF file exists before uploading it
       - name: Check if SARIF file exists
