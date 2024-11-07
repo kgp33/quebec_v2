@@ -66,9 +66,28 @@ def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
             for dependency in file.get('results', {}).get('dependencies', []):
                 #get the known vulnerabilities for each dependency
                 for specification in dependency.get('specifications', []):
+                    #extract package
+                    raw_spec = specification.get('raw', None)
+                    if raw_spec:
+                        package_name = raw_spec.split('==')[0]
+                        package_version = raw_spec.split('==')[1]
+                    
                     known_vulnerabilities = specification.get('vulnerabilities', {}).get('known_vulnerabilities', [])
-                
                     if known_vulnerabilities:
+                        for vuln in known_vulnerabilities:
+                            vulns.append({
+                                'id': vuln.get('id', 'UNKNOWN'),
+                                'description': vuln.get('description', 'No description available.'),
+                                'package_name': package_name,
+                                'package_version': package_version,
+                                'severity': vuln.get('severity', 'LOW').upper(),
+                                'line': vuln.get('line', 1),
+                                'vulnerable_spec': vuln.get('vulnerable_spec', ''),
+                                'rule_id': vuln.get('id', 'UNKNOWN'),
+                            })
+
+
+
                         vulns.extend(known_vulnerabilities)
 
     if not vulns:
@@ -77,27 +96,17 @@ def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
 
     for vuln in vulns:
         print(f"Processing vulnerability: {vuln}")
-        #want to handle issues with data appropriately
-        #mark rule_id as 'UNKNOWN' if vuln_id is missing
-        rule_id = vuln.get('id', 'UNKNOWN')
-        description = vuln.get('description', 'No description available.')
-        package_name = vuln.get('package_name', 'Unknown package')
-        #default to 'LOW' if no severity is provided
-        severity = vuln.get('severity', 'LOW').upper()
 
-        #placeholder for line number if available in the issue data
-        start_line = vuln.get('line', 1)
+        if f"{vuln['package_name']}=={vuln['package_version']}" in dependencies:
+            matched_files = find_files_for_package(vuln['package_name'], source_dir="src")
 
-        if package_name.lower() in dependencies:
-            matched_files = find_files_for_package(package_name, source_dir="src")
-
-        #converting the results of safety scan to sarif format
+            #converting the results of safety scan to sarif format
             for matched_file in matched_files:
                 uri_value = f"file://{os.path.abspath(matched_file)}"
                 sarif_data['runs'][0]['results'].append({
-                    "ruleId": rule_id,
+                    "ruleId": vuln['rule_id'],
                     "message": {
-                        "text": description
+                        "text": vuln['description']
                     },
                     "locations": [
                         {
@@ -106,15 +115,15 @@ def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
                                     "uri": uri_value
                                 },
                                 "region": {
-                                    "startLine": start_line
+                                    "startLine": vuln['line']
                                 }
                             }
                         }
                     ],
                     "properties": {
-                        "severity": severity
+                        "severity": vuln['severity']
                     },
-                    "packageName": package_name
+                    "packageName": f"{vuln['package_name']}=={vuln['package_version']}"
                 })
         else:
             print(f"Package '{package_name}' is not in the requirements.txt. Skipping SARIF entry.")
