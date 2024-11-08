@@ -67,7 +67,7 @@ def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
     }
 
     vulns = []
-    processed_vulnerabilities = set()
+    processed_vulnerabilities = {}
 
     #traversing through the projects and dependencies to check for vulnerabilities
     for project in safety_data.get('scan_results', {}).get('projects', []):
