@@ -90,9 +90,23 @@ def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
                     known_vulnerabilities = specification.get('vulnerabilities', {}).get('known_vulnerabilities', [])
                     if known_vulnerabilities:
                         for vuln in known_vulnerabilities:
-                            vuln_data = {
-                                'id': vuln.get('id', 'UNKNOWN'),
-                                'description': vuln.get('description', 'No description available.'),
+                                'vuln_id' = vuln.get('id', 'UNKNOWN')
+                                'description' = vuln.get('description', '')
+
+                                #if no description, go to website:
+                                if not description:
+                                    description = f"See details at: https://data.safetycli.com/v/{vuln_id}/eda"
+
+                                package_name = vuln.get('package_name', 'UNKNOWN_PACKAGE')
+                                package_version = vuln.get('package_version', 'UNKNOWN_VERSION')
+                                severity = vuln.get('severity', 'LOW').upper()
+                                line = vuln.get('line', 1)
+                                vulnerable_spec = vuln.get('vulnerable_spec', '')
+                                rule_id = vuln.get('id', 'UNKNOWN')
+                                
+                                vuln_data = {
+                                'vuln_id': id,
+                                'description': description,
                                 'package_name': package_name,
                                 'package_version': package_version,
                                 'severity': vuln.get('severity', 'LOW').upper(),
