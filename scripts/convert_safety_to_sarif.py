@@ -28,6 +28,15 @@ def find_files_for_package(package_name, source_dir="src"):
                         matched_files.append(os.path.relpath(os.path.join(root, file)))
     return matched_files
 
+def find_import_line(file_path, package_name):
+    with open(file_path, 'r') as f:
+        for line_num, line in enumerate(f, start=1):
+            # Check if the package is being imported in any form
+            if re.search(rf'\bimport\s+{re.escape(package_name)}\b', line, re.IGNORECASE) or \
+               re.search(rf'\bfrom\s+{re.escape(package_name)}\s+import', line, re.IGNORECASE):
+                return line_num
+    return None
+
 def generate_fingerprint(uri, line):
     #combine the file path and line number to create a unique fingerprint (this is required by sarif format)
     data = f"{uri}-{line}".encode('utf-8')
@@ -112,11 +121,6 @@ def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
             for vuln in vulnerabilities:
                 vuln_id = vuln.get('id', 'UNKNOWN')
                 description = vuln.get('description', '')
-
-                # If no description, provide a URL to the details
-                if not description:
-                    description = f"See details at: https://data.safetycli.com/v/{vuln_id}/eda"
-
                 severity = vuln.get('severity', 'LOW').upper()
                 line = vuln.get('line', 1)
                 vulnerable_spec = vuln.get('vulnerable_spec', '')
@@ -136,6 +140,11 @@ def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
                 #converting the results of safety scan to sarif format
                 for matched_file in matched_files:
                     uri_value = os.path.relpath(matched_file, start=os.getcwd())
+                    import_line = find_import_line(matched_file, package_name)
+                    if import_line:
+                        line = import_line
+                    if not description:
+                        description = f"{uri_value} uses vulnerable package '{package_name}' at line {line}."
                     fingerprint = generate_fingerprint(uri_value, vuln['line'])
                     sarif_data['runs'][0]['results'].append({
                         "ruleId": vuln['rule_id'],
@@ -155,7 +164,8 @@ def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
                             }
                         ],
                         "properties": {
-                            "severity": vuln['severity']
+                            "severity": vuln['severity'],
+                            "detailedLink": f"https://data.safetycli.com/v/{vuln_id}/eda"
                         },
                         "fingerprints": {
                             "primary": fingerprint
