@@ -105,7 +105,7 @@ def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
                                 rule_id = vuln.get('id', 'UNKNOWN')
                                 
                                 vuln_data = {
-                                'vuln_id': id,
+                                'vuln_id': vuln_id,
                                 'description': description,
                                 'package_name': package_name,
                                 'package_version': package_version,
