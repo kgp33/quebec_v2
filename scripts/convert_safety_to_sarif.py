@@ -2,7 +2,7 @@ import json
 import sys
 import os
 import hashlib
-
+import re as regex
 
 def load_requirements(requirements_file):
     with open(requirements_file, 'r') as f:
@@ -32,8 +32,8 @@ def find_import_line(file_path, package_name):
     with open(file_path, 'r') as f:
         for line_num, line in enumerate(f, start=1):
             # Check if the package is being imported in any form
-            if re.search(rf'\bimport\s+{re.escape(package_name)}\b', line, re.IGNORECASE) or \
-               re.search(rf'\bfrom\s+{re.escape(package_name)}\s+import', line, re.IGNORECASE):
+            if regex.search(rf'\bimport\s+{regex.escape(package_name)}\b', line, regex.IGNORECASE) or \
+               regex.search(rf'\bfrom\s+{regex.escape(package_name)}\s+import', line, regex.IGNORECASE):
                 return line_num
     return None
 
@@ -75,7 +75,6 @@ def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
         ]
     }
 
-    #vulns = []
     processed_vulnerabilities = {}
 
     #traversing through the projects and dependencies to check for vulnerabilities
