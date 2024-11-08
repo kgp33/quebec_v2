@@ -115,11 +115,11 @@ def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
                                 'rule_id': vuln.get('id', 'UNKNOWN'),
                             }
                             
-                            if package_name and package_version:
-                                vulns.append(vuln_data)
-                                print(f"Processed vulnerability: {vuln_data}")
-                            else:
-                                print(f"Skipping vulnerability for {package_name} due to missing package version.")
+                        if package_name and package_version:
+                            vulns.append(vuln_data)
+                            print(f"Processed vulnerability: {vuln_data}")
+                        else:
+                            print(f"Skipping vulnerability for {package_name} due to missing package version.")
 
                     else:
                         print(f"No vulnerabilities found for {dependency.get('name', 'Unknown')}")
