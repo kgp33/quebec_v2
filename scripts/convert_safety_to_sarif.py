@@ -90,8 +90,8 @@ def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
                     known_vulnerabilities = specification.get('vulnerabilities', {}).get('known_vulnerabilities', [])
                     if known_vulnerabilities:
                         for vuln in known_vulnerabilities:
-                                'vuln_id' = vuln.get('id', 'UNKNOWN')
-                                'description' = vuln.get('description', '')
+                                vuln_id = vuln.get('id', 'UNKNOWN')
+                                description = vuln.get('description', '')
 
                                 #if no description, go to website:
                                 if not description:
