@@ -69,7 +69,7 @@ def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
     vulns = []
     processed_vulnerabilities = set()
 
-    # Traversing through the projects and dependencies to check for vulnerabilities
+    #traversing through the projects and dependencies to check for vulnerabilities
     for project in safety_data.get('scan_results', {}).get('projects', []):
         for file in project.get('files', []):
             for dependency in file.get('results', {}).get('dependencies', []):
@@ -88,58 +88,50 @@ def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
                         continue
                     
                     # Skip if we've already processed this vulnerability
-                    if (package_name, package_version) in processed_vulnerabilities:
+                    if package_name in processed_vulnerabilities:
+                        processed_vulnerabilities[package_name].extend(
+                            [vuln for vuln in specification.get('vulnerabilities', {}).get('known_vulnerabilities', [])]
+                        )
                         continue
 
-                    processed_vulnerabilities.add((package_name, package_version))
+                    # Otherwise, add this package with its vulnerabilities
+                    processed_vulnerabilities[package_name] = specification.get('vulnerabilities', {}).get('known_vulnerabilities', [])
 
-                    known_vulnerabilities = specification.get('vulnerabilities', {}).get('known_vulnerabilities', [])
-                    if known_vulnerabilities:
-                        for vuln in known_vulnerabilities:
-                            vuln_id = vuln.get('id', 'UNKNOWN')
-                            description = vuln.get('description', '')
+    # Now process the vulnerabilities and generate SARIF results
+    for package_name, vulnerabilities in processed_vulnerabilities.items():
+        print(f"Found {len(vulnerabilities)} vulnerabilities for package '{package_name}'.")
 
-                            # If no description, provide a URL to the details
-                            if not description:
-                                description = f"See details at: https://data.safetycli.com/v/{vuln_id}/eda"
+        # Get files that import this package (only once per package)
+        matched_files = find_files_for_package(package_name, source_dir=".")
+        if not matched_files:
+            print(f"No Python files found that import {package_name}.")
+        else:
+            print(f"Found {len(matched_files)} files that import {package_name}.")
 
-                            severity = vuln.get('severity', 'LOW').upper()
-                            line = vuln.get('line', 1)
-                            vulnerable_spec = vuln.get('vulnerable_spec', '')
-                            rule_id = vuln.get('id', 'UNKNOWN')
+        # Process each vulnerability for the package
+        for vuln in vulnerabilities:
+            vuln_id = vuln.get('id', 'UNKNOWN')
+            description = vuln.get('description', '')
+
+            # If no description, provide a URL to the details
+            if not description:
+                description = f"See details at: https://data.safetycli.com/v/{vuln_id}/eda"
+
+            severity = vuln.get('severity', 'LOW').upper()
+            line = vuln.get('line', 1)
+            vulnerable_spec = vuln.get('vulnerable_spec', '')
+            rule_id = vuln.get('id', 'UNKNOWN')
                             
-                            vuln_data = {
-                                'vuln_id': vuln_id,
-                                'description': description,
-                                'package_name': package_name,
-                                'package_version': package_version,
-                                'severity': severity,
-                                'line': line,
-                                'vulnerable_spec': vulnerable_spec,
-                                'rule_id': rule_id
-                            }
-
-                            vulns.append(vuln_data)
-                            print(f"Processed vulnerability: {vuln_data}")
-                    else:
-                        print(f"No vulnerabilities found for {dependency.get('name', 'Unknown')}")
-
-
-    if not vulns:
-        print("No vulnerabilities found in the Safety JSON. Skipping SARIF conversion.")
-        sys.exit(0)
-    else:
-        print(f"{len(vulns)} vulnerabilities found.")
-
-    for vuln in vulns:
-        print(f"Processing vulnerability: {vuln}")
-
-        if f"{vuln['package_name']}=={vuln['package_version']}" in dependencies:
-            matched_files = find_files_for_package(vuln['package_name'], source_dir=".")
-            if not matched_files:
-                print(f"No Python files found that import {vuln['package_name']}.")
-            else:
-                print(f"Found {len(matched_files)} files that import {vuln['package_name']}.")
+            vuln_data = {
+                'vuln_id': vuln_id,
+                'description': description,
+                'package_name': package_name,
+                'package_version': package_version,
+                'severity': severity,
+                'line': line,
+                'vulnerable_spec': vulnerable_spec,
+                'rule_id': rule_id
+            }
 
             #converting the results of safety scan to sarif format
             for matched_file in matched_files:
