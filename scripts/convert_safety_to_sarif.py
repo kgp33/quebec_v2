@@ -67,14 +67,14 @@ def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
     }
 
     vulns = []
+    processed_vulnerabilities = set()
 
-    #traversing through the projects and dependencies to check for vulnerabilities
+    # Traversing through the projects and dependencies to check for vulnerabilities
     for project in safety_data.get('scan_results', {}).get('projects', []):
         for file in project.get('files', []):
             for dependency in file.get('results', {}).get('dependencies', []):
-                #get the known vulnerabilities for each dependency
+                # Get the known vulnerabilities for each dependency
                 for specification in dependency.get('specifications', []):
-                    #extract package
                     raw_spec = specification.get('raw', None)
                     print(f"*******{raw_spec}******")
                     if not raw_spec:
@@ -87,42 +87,43 @@ def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
                         print(f"Error splitting raw spec: {raw_spec}. Error: {str(e)}")
                         continue
                     
+                    # Skip if we've already processed this vulnerability
+                    if (package_name, package_version) in processed_vulnerabilities:
+                        continue
+
+                    processed_vulnerabilities.add((package_name, package_version))
+
                     known_vulnerabilities = specification.get('vulnerabilities', {}).get('known_vulnerabilities', [])
                     if known_vulnerabilities:
                         for vuln in known_vulnerabilities:
-                                vuln_id = vuln.get('id', 'UNKNOWN')
-                                description = vuln.get('description', '')
+                            vuln_id = vuln.get('id', 'UNKNOWN')
+                            description = vuln.get('description', '')
 
-                                #if no description, go to website:
-                                if not description:
-                                    description = f"See details at: https://data.safetycli.com/v/{vuln_id}/eda"
+                            # If no description, provide a URL to the details
+                            if not description:
+                                description = f"See details at: https://data.safetycli.com/v/{vuln_id}/eda"
 
-                                package_name = vuln.get('package_name', 'UNKNOWN_PACKAGE')
-                                package_version = vuln.get('package_version', 'UNKNOWN_VERSION')
-                                severity = vuln.get('severity', 'LOW').upper()
-                                line = vuln.get('line', 1)
-                                vulnerable_spec = vuln.get('vulnerable_spec', '')
-                                rule_id = vuln.get('id', 'UNKNOWN')
-                                
-                                vuln_data = {
+                            severity = vuln.get('severity', 'LOW').upper()
+                            line = vuln.get('line', 1)
+                            vulnerable_spec = vuln.get('vulnerable_spec', '')
+                            rule_id = vuln.get('id', 'UNKNOWN')
+                            
+                            vuln_data = {
                                 'vuln_id': vuln_id,
                                 'description': description,
                                 'package_name': package_name,
                                 'package_version': package_version,
-                                'severity': vuln.get('severity', 'LOW').upper(),
-                                'line': vuln.get('line', 1),
-                                'vulnerable_spec': vuln.get('vulnerable_spec', ''),
-                                'rule_id': vuln.get('id', 'UNKNOWN'),
+                                'severity': severity,
+                                'line': line,
+                                'vulnerable_spec': vulnerable_spec,
+                                'rule_id': rule_id
                             }
-                            
-                        if package_name and package_version:
+
                             vulns.append(vuln_data)
                             print(f"Processed vulnerability: {vuln_data}")
-                        else:
-                            print(f"Skipping vulnerability for {package_name} due to missing package version.")
-
                     else:
                         print(f"No vulnerabilities found for {dependency.get('name', 'Unknown')}")
+
 
     if not vulns:
         print("No vulnerabilities found in the Safety JSON. Skipping SARIF conversion.")
