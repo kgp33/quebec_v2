@@ -66,7 +66,7 @@ def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
         ]
     }
 
-    vulns = []
+    #vulns = []
     processed_vulnerabilities = {}
 
     #traversing through the projects and dependencies to check for vulnerabilities
@@ -101,7 +101,6 @@ def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
     for package_name, vulnerabilities in processed_vulnerabilities.items():
         print(f"Found {len(vulnerabilities)} vulnerabilities for package '{package_name}'.")
 
-        # Get files that import this package (only once per package)
         matched_files = find_files_for_package(package_name, source_dir=".")
         if not matched_files:
             print(f"No Python files found that import {package_name}.")
@@ -109,20 +108,21 @@ def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
             print(f"Found {len(matched_files)} files that import {package_name}.")
 
         # Process each vulnerability for the package
-        for vuln in vulnerabilities:
-            vuln_id = vuln.get('id', 'UNKNOWN')
-            description = vuln.get('description', '')
+        if vulnerabilities:
+            for vuln in vulnerabilities:
+                vuln_id = vuln.get('id', 'UNKNOWN')
+                description = vuln.get('description', '')
 
-            # If no description, provide a URL to the details
-            if not description:
-                description = f"See details at: https://data.safetycli.com/v/{vuln_id}/eda"
+                # If no description, provide a URL to the details
+                if not description:
+                    description = f"See details at: https://data.safetycli.com/v/{vuln_id}/eda"
 
-            severity = vuln.get('severity', 'LOW').upper()
-            line = vuln.get('line', 1)
-            vulnerable_spec = vuln.get('vulnerable_spec', '')
-            rule_id = vuln.get('id', 'UNKNOWN')
+                severity = vuln.get('severity', 'LOW').upper()
+                line = vuln.get('line', 1)
+                vulnerable_spec = vuln.get('vulnerable_spec', '')
+                rule_id = vuln.get('id', 'UNKNOWN')
                             
-            vuln_data = {
+                vuln_data = {
                 'vuln_id': vuln_id,
                 'description': description,
                 'package_name': package_name,
@@ -133,36 +133,34 @@ def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
                 'rule_id': rule_id
             }
 
-            #converting the results of safety scan to sarif format
-            for matched_file in matched_files:
-                uri_value = os.path.relpath(matched_file, start=os.getcwd())
-                fingerprint = generate_fingerprint(uri_value, vuln['line'])
-                sarif_data['runs'][0]['results'].append({
-                    "ruleId": vuln['rule_id'],
-                    "message": {
-                        "text": vuln['description']
-                    },
-                    "locations": [
-                        {
-                            "physicalLocation": {
-                                "artifactLocation": {
-                                    "uri": uri_value
-                                },
-                                "region": {
-                                    "startLine": vuln['line']
+                #converting the results of safety scan to sarif format
+                for matched_file in matched_files:
+                    uri_value = os.path.relpath(matched_file, start=os.getcwd())
+                    fingerprint = generate_fingerprint(uri_value, vuln['line'])
+                    sarif_data['runs'][0]['results'].append({
+                        "ruleId": vuln['rule_id'],
+                        "message": {
+                            "text": vuln['description']
+                        },
+                        "locations": [
+                            {
+                                "physicalLocation": {
+                                    "artifactLocation": {
+                                        "uri": uri_value
+                                    },
+                                    "region": {
+                                        "startLine": vuln['line']
+                                    }
                                 }
                             }
+                        ],
+                        "properties": {
+                            "severity": vuln['severity']
+                        },
+                        "fingerprints": {
+                            "primary": fingerprint
                         }
-                    ],
-                    "properties": {
-                        "severity": vuln['severity']
-                    },
-                    "fingerprints": {
-                        "primary": fingerprint
-                    }
-                })
-        else:
-            print(f"Package '{package_name}' is not in the requirements.txt. Skipping SARIF entry.")
+                    })
     
     #write the data into the the sarif file that will get uploaded
     try:
