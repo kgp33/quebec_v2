@@ -141,9 +141,9 @@ def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
                     uri_value = os.path.relpath(matched_file, start=os.getcwd())
                     import_line = find_import_line(matched_file, package_name)
                     if import_line:
-                        line = import_line
+                        vuln['line'] = import_line
                     if not description:
-                        description = f"{uri_value} uses vulnerable package '{package_name}' at line {line}."
+                        vuln['description'] = f"{uri_value} uses vulnerable package '{package_name}' at line {line}."
                     fingerprint = generate_fingerprint(uri_value, vuln['line'])
                     sarif_data['runs'][0]['results'].append({
                         "ruleId": vuln['rule_id'],
