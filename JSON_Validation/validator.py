@@ -4,8 +4,15 @@ from jsonschema.exceptions import ValidationError
 import os
 
 def load_portfolio(json_file):
-    script_dir = os.path.dirname(__file__)  # Directory of the current script
-    file_path = os.path.join(script_dir, json_file)  # Construct full path to JSON file
+    #script_dir = os.path.dirname(__file__)  # Directory of the current script
+    #file_path = os.path.join(script_dir, json_file)  # Construct full path to JSON file
+
+    # Directory of the current script
+    script_dir = os.path.dirname(__file__)
+    # Move one directory up
+    parent_dir = os.path.abspath(os.path.join(script_dir, '..'))
+    # Construct full path to JSON file
+    file_path = os.path.join(parent_dir, json_file)
 
     with open(file_path, 'r') as stock_file:
         portfolio = json.load(stock_file)
