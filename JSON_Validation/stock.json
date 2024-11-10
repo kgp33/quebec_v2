@@ -1,14 +1,10 @@
-{
-    "stocks": [
-        {
-            "ticker": "AAPL",
-            "nShares": 10,
-            "purchase_date": "2010-10-13"
-        },
-        {
-            "ticker": "IBM",
-            "nShares": 20,
-            "purchase_date": "2010-10-13"
-        }
-    ]
-}
+[
+    {
+        "ticker": "AAPL", 
+        "nShares": 10
+    }, 
+    {
+        "ticker": "IBM",
+        "nShares": 20
+    }
+]

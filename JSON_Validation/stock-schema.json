@@ -1,32 +1,22 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "type": "object",
-    "$id": "http://quebecproject.com/stock-schema",
-    "title": "Stock",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "array",
+  "$id": "http://quebecproject.com/stock-schema",
+  "title": "Stock",
+  "items": {
+      "type": "object",
       "properties": {
-          "stocks": {
-              "type": "array",
-              "items": {
-                  "type": "object",
-                  "properties": {
-                      "ticker": {
-                        "type": "string",
-                        "minLength": 3,
-                        "maxLength": 5 
-                      },
-                      "nShares": {
-                        "type": "integer",
-                        "minimum": 1
-                      },
-                      "purchase_date": {
-                        "type": "string", 
-                        "format": "date" 
-                      }
-                  },
-                  "required": ["ticker", "nShares", "purchase_date"]
-              }
+          "ticker": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 5
+          },
+          "nShares": {
+              "type": "integer",
+              "minimum": 1
           }
-      },
-      "required": ["stocks"]
+  },
+      "required": ["ticker", "nShares"],
+      "additionalProperties": false
   }
-  
+}

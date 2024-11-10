@@ -2,6 +2,7 @@ import yfinance as yf
 from datetime import datetime
 import json
 import pandas as pd
+import os
 
 from JSON_Validation.validator import validate_portfolio, load_schema, load_portfolio
 
@@ -83,30 +84,10 @@ def fetch_portfolio_sharpe_ratio(portfolio, price_data, total_investment, risk_f
         print(f"Error fetching historical prices for portfolio: {e}")
         return None
 
-def calculate_total_portfolio_value(portfolio, price_data, Date=datetime.today().strftime('%Y-%m-%d')):
-    """
-    Calculates the total current value of all stocks in the portfolio on the specific day.
-
-    Parameters:
-        portfolio (dict): A dictionary containing the portfolio data.
-        price_data (DataFrame): Price data for a list of tickers.
-        Date (str): A date in 'YYYY-MM-DD' format. 
-
-    Returns:
-        float: The total value of the portfolio.
-    """
-    total_value = 0
-    for stock in portfolio:
-        ticker = stock['ticker']
-        nShares = stock['nShares']
-        try:
-            stock_price = price_data[ticker].loc[Date]
-            total_value += nShares * stock_price
-        except KeyError as e:
-            print(f"Error fetching current price for {ticker}: {e}")
-            return None
-    return total_value
-
+# This function is no longer needed
+'''
+def load_portfolio(filename):
+'''
 
 def load_and_validate_portfolio():
     """
@@ -124,7 +105,59 @@ def load_and_validate_portfolio():
         return None
 
 # Load, validate, and calculate total portfolio value
-validated_portfolio = load_and_validate_portfolio()['stocks']
+#validated_portfolio = load_and_validate_portfolio()['stocks']
+#validated_portfolio = load_and_validate_portfolio()
+#portfolio_data = validated_portfolio
+
+def calculate_total_portfolio_value(portfolio, price_data, Date=datetime.today().strftime('%Y-%m-%d')):
+    """
+    Calculates the total current value of all stocks in the portfolio on the specific day.
+
+    Parameters:
+        portfolio (dict): A dictionary containing the portfolio data.
+        price_data (DataFrame): Price data for a list of tickers.
+        Date (str): A date in 'YYYY-MM-DD' format. 
+
+    Returns:
+        float: The total value of the portfolio.
+    """
+    total_value = 0
+    for stock in portfolio:
+        ticker = stock['ticker']
+        nShares = stock['nShares']
+        try:
+            # Check if the Date exists in the price data
+            if Date not in price_data.index:
+                # If not, get the last available close date
+                last_valid_date = price_data.index[price_data.index <= Date].max()
+                if pd.isnull(last_valid_date):
+                    print(f"No available price data for {ticker} before {Date}.")
+                    return None
+                Date = last_valid_date
+            
+            # Get stock price from the last valid date
+            stock_price = price_data[ticker].loc[Date]
+            total_value += nShares * stock_price
+
+        except KeyError as e:
+            print(f"Error fetching price for {ticker} on {Date}: {e}")
+            return None
+
+        #try:
+        #    stock_price = price_data[ticker].loc[Date]
+        #    total_value += nShares * stock_price
+        #except KeyError as e:
+        #    print(f"Error fetching price on {e}")
+        #    return None
+    return total_value
+
+# Load the portfolio JSON
+#portfolio_file = 'stock.json'
+#portfolio_data = load_portfolio(portfolio_file)
+#portfolio_data = load_and_validate_portfolio()
+
+
+validated_portfolio = load_and_validate_portfolio()
 portfolio_data = validated_portfolio
 
 if validated_portfolio:
@@ -149,9 +182,29 @@ else:
 
 
 
+'''
+tickers = pd.DataFrame(portfolio_data)['ticker'].to_list()
+price_data = yf.download(tickers, period='1y', progress=False)['Close']
+
+    
 # code to generate test_data.json
 # test_data = yf.download(tickers, period='1y', progress=False)['Close']
 # test_data.to_json('test_data.json')
+
+# Calculate total portfolio value on today
+total_portfolio_value = calculate_total_portfolio_value(
+    portfolio_data, price_data)
+if total_portfolio_value:
+    print("Total value of the portfolio today is: " + str(total_portfolio_value))
+
+    # Calculate sharpe ratio
+    sharpe_ratio = fetch_portfolio_sharpe_ratio(
+        portfolio_data, price_data, total_portfolio_value)
+    print("Sharpe ratio of the portfolio is: " + str(sharpe_ratio))
+
+
+
+
 
 #code to read in unit test data
 #test_data = pd.read_json('test_data.json')
@@ -161,3 +214,8 @@ else:
 #    portfolio_data, test_data, '2024-11-04')
 #print("Total value of the test portfolio today is: " + str(total_test_portfolio_value))
 
+# Calculate test data sharpe ratio
+#test_sharpe_ratio = fetch_portfolio_sharpe_ratio(
+#    portfolio_data, test_data, total_test_portfolio_value)
+#print("Sharpe ratio of the test portfolio is: " + str(test_sharpe_ratio))
+'''
