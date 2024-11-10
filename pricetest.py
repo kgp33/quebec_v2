@@ -3,11 +3,6 @@ from datetime import datetime
 from price import fetch_portfolio_sharpe_ratio, load_portfolio, calculate_total_portfolio_value
 import pytest
 
-@pytest.fixture
-def price_data():
-    return pd.read_json('test_data.json')
-
-
 def test_calculate_total_portfolio_value(price_data):
 
     """
@@ -28,9 +23,9 @@ def test_calculate_total_portfolio_value(price_data):
     # Test the portfolio value function
     calculated_total_portfolio_value = calculate_total_portfolio_value(portfolio_data, price_data, '2024-11-04')
 
-    assert calculated_total_portfolio_value is not None, "Failed to calculate Portfolio Value"
+    assert calculated_total_portfolio_value is not None, "Failed to calculate Portfolio Value" #nosec
     assert abs(calculated_total_portfolio_value - expected_portfolio_value) <= tolerance, \
-        f"Test failed: The calculated Portfolio Value {calculated_total_portfolio_value} is not equal to the expected value {expected_portfolio_value}."
+        f"Test failed: The calculated Portfolio Value {calculated_total_portfolio_value} is not equal to the expected value {expected_portfolio_value}." #nosec
 
 
 def test_fetch_portfolio_sharpe_ratio(price_data):
