@@ -3,6 +3,10 @@ from datetime import datetime
 from price import fetch_portfolio_sharpe_ratio, load_portfolio, calculate_total_portfolio_value
 import pytest
 
+@pytest.fixture
+def price_data():
+    return pd.read_json('test_data.json')
+
 def test_calculate_total_portfolio_value(price_data):
 
     """
