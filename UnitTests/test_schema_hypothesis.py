@@ -1,21 +1,27 @@
 import json
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
+import os
 from hypothesis import given
 from hypothesis import strategies as st
 from hypothesis_jsonschema import from_schema
+from JSON_Validation.validator import load_schema
+
+schema = load_schema('stock-schema.json')
 
 #load the JSON schema file
-with open ('stock-schema.json') as stock_schema:
-    schema = json.load(stock_schema)
+
+#with open ('stock-schema.json') as stock_schema:
+    #schema = json.load(stock_schema)
 
 #function to make sure that Hypotheis generated stocks are valid per schema 
-def validate_portfolio(portfolio):
+def validate_portfolio(portfolio, schema):
     for stock in portfolio:
         validate(instance=stock, schema=schema)
 
 #using @given indicates a test function should receive automatically generated input data
 #if this test fails, we know theres an issue with how we're handling valid input
+schema = load_schema('stock-schema.json')  # Load the schema file
 @given(from_schema(schema))
 def test_valid_portfolio(portfolio):
     #print whats being generated
@@ -28,7 +34,8 @@ def test_valid_portfolio(portfolio):
 #st.one_of is a hypothesis strategy that lets you specify multiple strategies
 @given(st.lists(st.one_of(
     #this is going to generate valid stock entries based on schema
-    from_schema(schema),
+    ####from_schema(schema),
+    from_schema(load_schema('stock-schema.json')), #new
     #this is going to generate invalid stock entries that are zero or positive, which is invalid because schema indicates that a stock is an object, not an integer.
     st.integers(min_value=0),
     #this is going to generate dictionaries with random keys and integer values that have unexpected properties not allowed per the schema. 

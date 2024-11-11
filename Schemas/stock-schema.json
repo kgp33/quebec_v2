@@ -8,7 +8,7 @@
         "properties": {
             "ticker": {
                 "type": "string",
-                "minLength": 4,
+                "minLength": 3,
                 "maxLength": 5
             },
             "nShares": {
@@ -19,4 +19,4 @@
         "required": ["ticker", "nShares"],
         "additionalProperties": false
     }
-}
+  }

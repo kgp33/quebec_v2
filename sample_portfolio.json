@@ -1,0 +1,26 @@
+[
+    {
+        "ticker": "AAPL", 
+        "nShares": 10
+    }, 
+    {
+        "ticker": "MSFT",
+        "nShares": 20
+    },
+    {
+        "ticker": "GOOGL",
+        "nShares": 20
+    },
+    {
+        "ticker": "AMZN",
+        "nShares": 20
+    },
+    {
+        "ticker": "TSLA",
+        "nShares": 10
+    },
+    {
+        "ticker": "NVDA",
+        "nShares": 30
+    }
+]

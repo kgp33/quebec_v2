@@ -4,6 +4,10 @@
         "nShares": 10
     }, 
     {
+        "ticker": "IBM",
+        "nShares": 20
+    },
+    {
         "ticker": "MSFT",
         "nShares": 20
     },
