@@ -3,7 +3,6 @@ from datetime import datetime
 import json
 import pandas as pd
 import os
-import sys
 
 from JSON_Validation.validator import validate_portfolio, load_schema, load_portfolio
 
