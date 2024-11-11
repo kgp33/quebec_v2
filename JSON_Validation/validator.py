@@ -4,8 +4,15 @@ from jsonschema.exceptions import ValidationError
 import os
 
 def load_portfolio(json_file):
-    script_dir = os.path.dirname(__file__)  # Directory of the current script
-    file_path = os.path.join(script_dir, json_file)  # Construct full path to JSON file
+    #script_dir = os.path.dirname(__file__)  # Directory of the current script
+    #file_path = os.path.join(script_dir, json_file)  # Construct full path to JSON file
+
+    # Directory of the current script
+    script_dir = os.path.dirname(__file__)
+    # Move one directory up
+    parent_dir = os.path.abspath(os.path.join(script_dir, '..'))
+    # Construct full path to JSON file
+    file_path = os.path.join(parent_dir, json_file)
 
     with open(file_path, 'r') as stock_file:
         portfolio = json.load(stock_file)
@@ -15,14 +22,18 @@ def load_portfolio(json_file):
     return portfolio
 
 def load_schema(json_schema):
-    script_dir = os.path.dirname(__file__)  # Directory of the current script
-    file_path = os.path.join(script_dir, json_schema)  # Construct full path to JSON file
+    # Get the current directory where the script is located (validator.py)
+    script_dir = os.path.dirname(__file__)  
+    file_path = os.path.join(script_dir, '..', 'Schemas', json_schema)  # Move up one level and then to 'schemas'
+    print(f"Loading schema from: {file_path}")
 
     with open(file_path, 'r') as stock_schema:
         schema = json.load(stock_schema)
-    # Used for debugging
+    
+    # Used for debugging (optional)
     #print("Loaded Schema:")
     #print(json.dumps(schema, indent=2))
+    
     return schema
 
 def validate_portfolio(portfolio, schema):
