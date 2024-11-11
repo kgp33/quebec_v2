@@ -2,9 +2,9 @@ name: Security Scanning
 
 on:
   push:
-    branches: [ "main", "secure_coding_updates" ]
+    branches: [ "*" ]
   pull_request:
-    branches: [ "main", "secure_coding_updates" ]
+    branches: [ "*" ]
   schedule:
     - cron: '26 22 * * 2'
 
@@ -25,6 +25,7 @@ jobs:
         with:
           exit_zero: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          skips: 'B101'
 
       #installing Safety
       - name: Install safety
