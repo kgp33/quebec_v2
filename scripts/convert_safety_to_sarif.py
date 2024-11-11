@@ -31,7 +31,7 @@ def find_files_for_package(package_name, source_dir="src"):
 def find_import_line(file_path, package_name):
     with open(file_path, 'r') as f:
         for line_num, line in enumerate(f, start=1):
-            # Check if the package is being imported in any form
+            #see if vulnerable packages are being imported somewhere
             if regex.search(rf'\bimport\s+{regex.escape(package_name)}\b', line, regex.IGNORECASE) or \
                regex.search(rf'\bfrom\s+{regex.escape(package_name)}\s+import', line, regex.IGNORECASE):
                 return line_num
@@ -81,7 +81,6 @@ def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
     for project in safety_data.get('scan_results', {}).get('projects', []):
         for file in project.get('files', []):
             for dependency in file.get('results', {}).get('dependencies', []):
-                # Get the known vulnerabilities for each dependency
                 for specification in dependency.get('specifications', []):
                     raw_spec = specification.get('raw', None)
                     print(f"*******{raw_spec}******")
@@ -95,17 +94,16 @@ def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
                         print(f"Error splitting raw spec: {raw_spec}. Error: {str(e)}")
                         continue
                     
-                    # Skip if we've already processed this vulnerability
+                    #skip if we've already processed this vuln
                     if package_name in processed_vulnerabilities:
                         processed_vulnerabilities[package_name].extend(
                             [vuln for vuln in specification.get('vulnerabilities', {}).get('known_vulnerabilities', [])]
                         )
                         continue
 
-                    # Otherwise, add this package with its vulnerabilities
+                    #otherwise add this package with its vulns
                     processed_vulnerabilities[package_name] = specification.get('vulnerabilities', {}).get('known_vulnerabilities', [])
 
-    # Now process the vulnerabilities and generate SARIF results
     for package_name, vulnerabilities in processed_vulnerabilities.items():
         print(f"Found {len(vulnerabilities)} vulnerabilities for package '{package_name}'.")
 
@@ -115,7 +113,7 @@ def convert_safety_to_sarif(safety_json, sarif_file, requirements_file):
         else:
             print(f"Found {len(matched_files)} files that import {package_name}.")
 
-        # Process each vulnerability for the package
+        #generating sarif data
         if vulnerabilities:
             for vuln in vulnerabilities:
                 vuln_id = vuln.get('id', 'UNKNOWN')
