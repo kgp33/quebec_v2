@@ -3,7 +3,10 @@ from datetime import datetime
 import json
 import pandas as pd
 import os
+import sys
 
+# Add the parent directory to the path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from JSON_Validation.validator import validate_portfolio, load_schema, load_portfolio
 
 def fetch_portfolio_sharpe_ratio(portfolio, price_data, total_investment, risk_free_rate=0.03):
