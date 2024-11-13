@@ -34,3 +34,15 @@ Unit tests:
 - Restart the container:
 
     `docker start -i container_name`
+
+### VSCode + Container
+
+- Install 'Dev Containers' extention
+
+- Start your container:
+
+    `docker start container_name`
+
+- Find Remote Explorer in your side bar
+
+- Attach to your running container
