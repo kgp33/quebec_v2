@@ -168,7 +168,8 @@ def calculate_value_sharpe():
     else:
         print("Portfolio validation failed. Cannot calculate total value.")
 
-calculate_value_sharpe()
+if __name__ == "__main__":
+    calculate_value_sharpe()
 
 # code to generate test_data.json
 # test_data = yf.download(tickers, period='1y', progress=False)['Close']
