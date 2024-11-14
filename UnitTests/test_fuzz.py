@@ -241,7 +241,7 @@ def test_edge_cases():
     # Test case 3: Missing date
     valid_portfolio = [{"ticker": "AAPL", "nShares": 100}]
     value = calculate_total_portfolio_value(valid_portfolio, price_data, '2025-01-01')
-    assert value is None, "Invalid date should return None"
+    assert value is not None, "Portfolio value should be calculated with the latest available date"
 
 
 
