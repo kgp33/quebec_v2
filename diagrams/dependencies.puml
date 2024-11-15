@@ -1,83 +1,92 @@
-@startuml
-' Package diagram for the project structure
+@startuml modules_diagram
 
-package "JSON_Validation" {
-  class "Validator" {
-    +load_portfolio(json_file)
-    +load_schema(json_schema)
-    +validate_portfolio(portfolio, schema)
-    -portfolio
-    -schema
-  }
+' Allow mixing classes and other UML elements (like files)
+allowmixing
+
+' Define the package structure
+package "quebec_v2" {
+    package "JSON_Validation" {
+        class "validator" {
+        ' Defined functions
+        + load_portfolio()
+        + load_schema ()
+        + validate_portfolio()
+        }
+    }
+    package "PriceApp" {
+        class "price" {
+        ' Defined functions
+        + fetch_portfolio_sharpe_ratio()
+        + load_and_validate_portfolio()
+        + calculate_total_portfolio_value()
+        + calculate_value_sharpe()
+        }
+    }
+    package "UnitTests" {
+        class "conftest"
+        class "test_price" {
+        ' Defined functions
+        + price_data()
+        + test_calculate_total_portfolio_value()
+        + test_fetch_portfolio_sharpe_ratio()
+        }
+        class "test_schema_hypothesis" {
+        ' Defined functions
+         + validate_portfolio()
+         + test_valid_portfolio()
+         + test_valid_invalid_portfolio()
+        }
+
+    }
+    package "scripts" {
+        class "convert_safety_to_sarif" {
+        ' Defined functions
+        + find_files_for_package()
+        + find_import_line()
+        + generate_fingerprint()
+        }
+        class "trigger_safety"
+    }
+    package "Schemas" {
+        ' Marking as a data class (JSON)'
+        file "stock-schema.json" << (S, #FFAAAA) >>
+    }
 }
 
-package "PriceApp" {
-  class "Price" {
-    +fetch_portfolio_sharpe_ratio(portfolio, price_data, total_investment, risk_free_rate)
-    +load_and_validate_portfolio()
-    +calculate_total_portfolio_value(portfolio, price_data, Date)
-    +calculate_value_sharpe()
-  }
+' Define external dependencies as classes
+class "hypothesis" {
+    ' Defined methods
+    + given()
+    + strategies()
 }
 
-package "Scripts" {
-  class "ConvertSafetyToSarif" {
-    +load_requirements(requirements_file)
-    +find_files_for_package(package_name, source_dir)
-    +find_import_line(file_path, package_name)
-    +generate_fingerprint(uri, line)
-    +convert_safety_to_sarif(safety_json, sarif_file, requirements_file)
-  }
+class "hypothesis_jsonschema" {
+    ' Defined methods
+    + from_schema()
 }
 
-package "UnitTests" {
-  class "TestPrice" {
-    +price_data()
-    +test_calculate_total_portfolio_value(price_data)
-    +test_fetch_portfolio_sharpe_ratio(price_data)
-  }
 
-  class "TestSchemaHypothesis" {
-    +validate_portfolio(portfolio, schema)
-    +test_valid_portfolio(portfolio)
-    +test_valid_invalid_portfolio(portfolio)
-  }
-
-  class "Conftest" {
-    +setup_config()
-  }
+class "jsonschema" {
+    ' Defined methods
+    + exceptions()
 }
 
-package "Schemas" {
-  class "StockSchema" {
-    +$schema
-    +$id
-    +title
-    +items
-  }
+class "pandas" {
+    ' Defined methods
+    + DataFrame()
+    + read_json()
+}
+class "pytest" {
+    ' Defined methods
+}
+class "yfinance" {
+    ' Defined methods
+    + download()
 }
 
-' Relationships
-
-' JSON_Validation -> PriceApp
-PriceApp.Price --> JSON_Validation.Validator : uses validate_portfolio, load_schema, load_portfolio
-
-' PriceApp dependencies (Removed external libraries)
-' PriceApp.Price --> yfinance : uses yf.download
-' PriceApp.Price --> pandas : uses pd.DataFrame, pd.isnull
-' PriceApp.Price --> datetime : uses datetime.today().strftime
-
-' Scripts dependencies (Removed external libraries)
-' Scripts.ConvertSafetyToSarif --> JSON_Validation.Validator : uses load_requirements
-' Scripts.ConvertSafetyToSarif --> os : uses os
-' Scripts.ConvertSafetyToSarif --> hashlib : uses hashlib
-' Scripts.ConvertSafetyToSarif --> re : uses regex
-
-' UnitTest dependencies
-UnitTests.TestPrice --> PriceApp.Price : tests fetch_portfolio_sharpe_ratio, calculate_total_portfolio_value
-UnitTests.TestSchemaHypothesis --> JSON_Validation.Validator : tests load_schema
-
-' Other Relationships
-Schemas.StockSchema --> JSON_Validation.Validator : referenced by load_schema
+' Add standalone files
+file "stock.json" << (S, #FFAAAA) >>
+file "sample_portfolio.json" << (S, #FFAAAA) >>
+file "requirements.txt" << (T, #FFFFFF) >>
 
 @enduml
