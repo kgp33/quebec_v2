@@ -94,6 +94,9 @@ Per the Software Engineering Body of Knowledge (SWEBOK), published by the IEEE C
 
 The Quebec team is utilizing [Hypothesis](https://hypothesis.works), as well as [hypothesis_jsonschema](https://pypi.org/project/hypothesis-jsonschema/) to test the robustness of our json schema, as defined in `Schemas/stock-schema.json`. The test is configured in `UnitTests/test_schema_hypothesis.py` and confirms that our program can properly process valid and invalid input. 
 
+Fuzz Testing Implementation:
+The Quebec team has implemented fuzz tests using Hypothesis to evaluate the portfolio valuation and Sharpe ratio calculations. These tests dynamically generate random portfolios and historical price data to ensure the program's robustness against a wide variety of input scenarios.
+
 Usage and setup information for Hypothesis can be found [here](https://github.com/kgp33/quebec_v2/blob/main/DOCS/Hypothesis_Info%26Setup.md).
 
 [^2]: https://fintechpython.pages.oit.duke.edu/jupyternotebooks/1-Core%20Python/answers/rq-22-answers.html
