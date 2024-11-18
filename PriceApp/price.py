@@ -241,11 +241,12 @@ def calculate_value_sharpe():
             validated_portfolio, price_data, total_portfolio_value)
         if sharpe_ratio is not None:
             print("Sharpe ratio of the portfolio is " + str(sharpe_ratio))
-            price_data = fetch_price_data(tickers, period='5y')
-            portfolio_values = calculate_portfolio_value_over_time(
-                price_data, validated_portfolio)
-            display_performance_visualizations(
-                price_data, portfolio_values, validated_portfolio, total_portfolio_value, sharpe_ratio)
+            if visualization == True:
+                price_data = fetch_price_data(tickers, period='5y')
+                portfolio_values = calculate_portfolio_value_over_time(
+                    price_data, validated_portfolio)
+                display_performance_visualizations(
+                    price_data, portfolio_values, validated_portfolio, total_portfolio_value, sharpe_ratio)
 
         else:
             print("Could not calculate Sharpe ratio due to missing data.")
@@ -253,7 +254,13 @@ def calculate_value_sharpe():
         print("Portfolio validation failed. Cannot calculate total value.")
 
 
+if __name__ == "__main__":
+    visualization = True
+else:
+    visualization = False
+
 calculate_value_sharpe()
+
 
 # code to generate test_data.json
 # test_data = yf.download(tickers, period='1y', progress=False)['Close']
