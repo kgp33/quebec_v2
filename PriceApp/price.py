@@ -256,10 +256,9 @@ def calculate_value_sharpe():
 
 if __name__ == "__main__":
     visualization = True
+    calculate_value_sharpe()
 else:
     visualization = False
-
-calculate_value_sharpe()
 
 
 # code to generate test_data.json
