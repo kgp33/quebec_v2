@@ -1,0 +1,71 @@
+@startuml modules_diagram
+
+' Allow mixing classes and other UML elements (like files)
+allowmixing
+
+class "yfinance" <<module>> << (M,orchid) >> {
+    + download()
+}
+
+package "pandas"  {
+    class "pandas" <<module>> << (M,orchid) >> {
+        + isnull()
+        + read_json()
+    }
+
+    class "DataFrame" {
+    }
+
+    "pandas" --> "DataFrame" : provides
+}
+
+class "json" <<module>> << (M,orchid) >> {
+}
+
+class "os"  <<module>> << (M,orchid) >> {
+}
+
+package "jsonschema" {
+    class "jsonschema"  <<module>> << (M,orchid) >> {
+    + validate()
+    }
+    class "exceptions.ValidationError" {
+    }
+    "jsonschema" --> "exceptions.ValidationError" : provides
+}
+
+file "stock.json" << (S, #FFAAAA) >>
+
+class "Schemas.stock-schema.json" << (S, #FFAAAA) >>
+
+package JSON_Validation {
+    class "validator_py" <<module>> << (M,orchid) >> {
+        ---
+        + load_portfolio()
+        + load_schema()
+        + validate_portfolio()
+    }
+}
+
+"JSON_Validation.validator_py" -down-> "json" : uses
+"JSON_Validation.validator_py" -down-> "os" : uses
+"JSON_Validation.validator_py" -down-> "Schemas.stock-schema.json" : uses
+"JSON_Validation.validator_py" -down-> "stock.json" : uses
+"JSON_Validation.validator_py" -down-> "jsonschema.jsonschema" : uses
+
+package PriceApp {
+    class "price_py"  <<module>> << (M,orchid) >> {
+        ---
+        + fetch_portfolio_sharpe_ratio()
+        + load_and_validate_portfolio()
+        + calculate_total_portfolio_value()
+        + calculate_value_sharpe()
+    }
+}
+
+"PriceApp.price_py" --> "yfinance" : uses
+"PriceApp.price_py" --> "pandas.pandas" : uses
+"PriceApp.price_py" --> "datetime.datetime" : uses
+"PriceApp.price_py" -right-> "JSON_Validation.validator_py" : uses
+
+@enduml

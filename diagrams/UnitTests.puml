@@ -1,0 +1,86 @@
+@startuml modules_diagram
+
+' Allow mixing classes and other UML elements (like files)
+allowmixing
+
+file "stock.json" << (S, #FFAAAA) >>
+file "sample_portfolio.json" << (S, #FFAAAA) >>
+
+package PriceApp {
+    class "price_py"  <<module>> << (M,orchid) >> {
+        ---
+        + fetch_portfolio_sharpe_ratio()
+        + load_and_validate_portfolio()
+        + calculate_total_portfolio_value()
+        + calculate_value_sharpe()
+    }
+}
+
+package UnitTests {
+    class "test_price_py" <<module>> << (M,orchid) >> {
+        ---
+        + price_data()
+        + test_calculate_total_portfolio_value()
+        + test_fetch_portfolio_sharpe_ratio()
+    }
+    class "test_schema_hypothesis_py" <<module>> << (M,orchid) >> {
+        ---
+        + validate_portfolio()
+        + test_valid_portfolio()
+        + test_valid_invalid_portfolio()`
+    }
+    class "conftest_py" <<module>> << (M,orchid) >> {
+    }
+}
+
+package Schemas {
+    file "stock-schema.json" << (S, #FFAAAA) >>
+    }
+
+package "jsonschema" {
+    class "jsonschema"  <<module>> << (M,orchid) >> {
+    + validate()
+    }
+    class "exceptions.ValidationError" {
+    }
+    "jsonschema" --> "exceptions.ValidationError" : provides
+}
+
+class "os"  <<module>> << (M,orchid) >> {
+}
+
+class "sys"  <<module>> << (M,orchid) >> {
+}
+
+class "pytest"  <<module>> << (M,orchid) >> {
+}
+
+class "hypothesis" <<module>> << (M,orchid) >> {
+    ---
+    + given()
+    + strategies()
+}
+
+class "hypothesis_jsonschema" <<module>> << (M,orchid) >> {
+    ---
+    + from_schema()
+}
+
+class "pandas" <<module>> << (M,orchid) >> {
+    ---
+    + read_json()
+}
+
+"UnitTests.test_price_py" -down-> "sample_portfolio.json" : uses
+"UnitTests.test_price_py" -down-> "stock.json" : uses
+"UnitTests.test_price_py" -down-> "pytest" : uses
+"UnitTests.test_price_py" -down-> "pandas" : uses
+"UnitTests.test_price_py" -down-> "PriceApp.price_py" : tests
+"UnitTests.test_schema_hypothesis_py" -down-> "Schemas.stock-schema.json" : tests
+"UnitTests.test_schema_hypothesis_py" -down-> "hypothesis_jsonschema" : uses
+"UnitTests.test_schema_hypothesis_py" -down-> "hypothesis" : uses
+"UnitTests.test_schema_hypothesis_py" -down-> "jsonschema.jsonschema" : uses
+"UnitTests.conftest_py" -down-> "os" : uses
+"UnitTests.conftest_py" -down-> "sys" : uses
+
+@enduml
