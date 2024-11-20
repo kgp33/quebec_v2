@@ -1,11 +1,32 @@
 @startuml
-actor PriceApp
-     calculate_value_sharpe -> load_and_validate_portfolio: load_and_validate_portfolio()
-     load_and_validate_portfolio -> load_schema: load_schema()
-     load_and_validate_portfolio -> load_portfolio: load_portfolio()
-     load_and_validate_portfolio -> validate_portfolio: validate_portfolio()
-     calculate_value_sharpe -> calculate_total_portfolio_value: calculate_total_portfolio_value()
-     calculate_value_sharpe -> fetch_portfolio_sharpe_ratio: fetch_portfolio_sharpe_ratio()
-actor JSON_Validation
-     validate_portfolio -> validate: validate()
+
+group PriceApp
+    price.calculate_value_sharpe -> price.load_and_validate_portfolio
+    activate price.load_and_validate_portfolio
+    group JSON_Validation
+        price.load_and_validate_portfolio -> validator.load_schema : schema location
+        activate validator.load_schema
+        price.load_and_validate_portfolio <-- validator.load_schema : loaded schema
+        deactivate validator.load_schema
+        price.load_and_validate_portfolio -> validator.load_portfolio : portfolio : portfolio location
+        activate validator.load_portfolio
+        price.load_and_validate_portfolio <-- validator.load_portfolio : portfolio : loaded portfolio
+        deactivate validator.load_portfolio
+        price.load_and_validate_portfolio -> validator.validate_portfolio : loaded portfolio and schema
+        activate validator.validate_portfolio
+        price.load_and_validate_portfolio <-- validator.validate_portfolio : valid/invalid portfolio decision
+        deactivate validator.validate_portfolio
+        price.calculate_value_sharpe <-- price.load_and_validate_portfolio : validated portfolio
+        deactivate price.load_and_validate_portfolio
+    end
+    price.calculate_value_sharpe -> price.calculate_total_portfolio_value : validated portfolio, price data
+    activate price.calculate_total_portfolio_value
+    price.calculate_value_sharpe <-- price.calculate_total_portfolio_value : total portfolio value
+    deactivate price.calculate_total_portfolio_value
+
+    price.calculate_value_sharpe -> price.fetch_portfolio_sharpe_ratio : validated portfolio, price data, total portfolio value
+    activate price.fetch_portfolio_sharpe_ratio
+    price.calculate_value_sharpe <-- price.fetch_portfolio_sharpe_ratio : sharpe ratio
+    deactivate price.fetch_portfolio_sharpe_ratio
+end
 @enduml
