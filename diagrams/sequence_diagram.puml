@@ -1,0 +1,11 @@
+@startuml
+actor PriceApp
+     calculate_value_sharpe -> load_and_validate_portfolio: load_and_validate_portfolio()
+     load_and_validate_portfolio -> load_schema: load_schema()
+     load_and_validate_portfolio -> load_portfolio: load_portfolio()
+     load_and_validate_portfolio -> validate_portfolio: validate_portfolio()
+     calculate_value_sharpe -> calculate_total_portfolio_value: calculate_total_portfolio_value()
+     calculate_value_sharpe -> fetch_portfolio_sharpe_ratio: fetch_portfolio_sharpe_ratio()
+actor JSON_Validation
+     validate_portfolio -> validate: validate()
+@enduml

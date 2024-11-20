@@ -1,0 +1,24 @@
+ @startjson
+        {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "type": "array",
+            "$id": "http://quebecproject.com/stock-schema",
+            "title": "Stock",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "ticker": {
+                        "type": "string",
+                        "minLength": 3,
+                        "maxLength": 5
+                    },
+                    "nShares": {
+                        "type": "integer",
+                        "minimum": 1
+                    }
+                },
+                "required": ["ticker", "nShares"],
+                "additionalProperties": false
+            }
+        }
+        @endjson

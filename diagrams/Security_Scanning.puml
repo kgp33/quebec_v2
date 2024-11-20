@@ -1,0 +1,111 @@
+@startuml
+!define RECTANGLE component
+
+' Allow mixing classes and other UML elements (like files)
+allowmixing
+
+' Define Workflow Triggers
+component "GitHub Actions Workflow" {
+  RECTANGLE "Trigger: Push" as push
+  RECTANGLE "Trigger: Pull Request" as pr
+  RECTANGLE "Trigger: Scheduled (Cron)" as cron
+}
+
+' Define Job for Security Scanning
+component "Job: Security Scanning" {
+  RECTANGLE "Permission granted: pull and read contents of repository" as perm_contents
+  RECTANGLE "Permission granted: write security events to GitHub Security" as perm_security
+  RECTANGLE "Permission granted: read GitHub's actions-related data (read)" as perm_actions
+  RECTANGLE "This job runs on a fresh Ubuntu Linux environment" as runs_on_ubuntu
+}
+
+' Define Steps within the Security Scanning Job
+component "Steps" {
+  RECTANGLE "Step 1: Checkout code repository" as checkout
+  RECTANGLE "Step 2: Run a Bandit security scan" as bandit_scan
+  RECTANGLE "Step 3: Install Safety" as install_safety
+  RECTANGLE "Step 4: Create ./scan-results directory" as create_output
+  RECTANGLE "Step 5: Run a Safety security scan and store results in ./scan-results/safety_output.json" as safety_scan
+  RECTANGLE "Step 6: Checks for vulnerabilities in ./scan-results/safety_output.json" as check_vulns
+  RECTANGLE "Step 7: Lists files contained within ./scan-results directory" as list_scan_results
+  RECTANGLE "Step 8: Converts ./scan-result/safety_output.json to ./scan-result/safety_output.sarif" as convert_sarif
+  RECTANGLE "Step 9: Confirms ./scan-result/safety_output.sarif was created" as check_sarif
+  RECTANGLE "Step 10: Confirms that ./scan-result/safety_output.sarif exists before uploading" as check_sarif_existence
+  RECTANGLE "Step 11: Uploads ./scan-result/safety_output.sarif to GitHub Code Scanning" as upload_sarif
+  RECTANGLE "Step 12: Skipping SARIF conversion because no vulnerabilities found" as skip_sarif
+}
+
+' Define the Relationships Between Components
+push -down-> "GitHub Actions Workflow"
+pr -down-> "GitHub Actions Workflow"
+cron -down-> "GitHub Actions Workflow"
+
+"GitHub Actions Workflow" -right-> "Job: Security Scanning"
+"Job: Security Scanning" -down-> "Steps"
+
+package scripts {
+    class convert_safety_to_sarif_py <<module>> << (M,orchid) >> {
+        ---
+        convert_safety_to_sarif()
+        find_files_for_package()
+        find_import_line()
+        generate_fingerprint()
+        load_requirements()
+    }
+}
+
+package "json"  {
+    class "json" <<module>> << (M,orchid) >> {
+        + load()
+        + dump()
+    }
+
+    class "JSONDecodeError" {
+    }
+
+    "json" --> "JSONDecodeError" : provides
+}
+
+class "os" <<module>> << (M,orchid) >> {
+}
+
+class "sys" <<module>> << (M,orchid) >> {
+}
+
+class "hashlib" <<module>> << (M,orchid) >> {
+    ---
+    + sha256.hexdigest()
+}
+
+class "regex" <<module>> << (M,orchid) >> {
+    ---
+    + search()
+    + escape()
+    + IGNORECASE
+}
+
+file "requirements.txt" << (S, #FFAAAA) >>
+
+convert_sarif -down-> "scripts.convert_safety_to_sarif_py" : uses
+"scripts.convert_safety_to_sarif_py" -down-> "regex" : uses
+"scripts.convert_safety_to_sarif_py" -down-> "os" : uses
+"scripts.convert_safety_to_sarif_py" -down-> "sys" : uses
+"scripts.convert_safety_to_sarif_py" -down-> "json.json" : uses
+"scripts.convert_safety_to_sarif_py" -down-> "hashlib" : uses
+
+
+' Show file flow between steps
+checkout -down-> bandit_scan
+bandit_scan -down-> install_safety
+install_safety -down-> create_output
+create_output -down-> safety_scan
+safety_scan -down-> check_vulns
+safety_scan -right-> "requirements.txt" : requires
+check_vulns -down-> list_scan_results : Vulnerabilities found
+check_vulns -down-> skip_sarif : "No vulnerabilities found"
+list_scan_results -down-> convert_sarif
+convert_sarif -down-> check_sarif
+check_sarif -down-> check_sarif_existence
+check_sarif_existence -down-> upload_sarif
+
+@enduml
