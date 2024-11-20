@@ -1,6 +1,7 @@
 @startuml
 
 group PriceApp
+    activate price.calculate_value_sharpe
     price.calculate_value_sharpe -> price.load_and_validate_portfolio
     activate price.load_and_validate_portfolio
     group JSON_Validation
@@ -28,5 +29,6 @@ group PriceApp
     activate price.fetch_portfolio_sharpe_ratio
     price.calculate_value_sharpe <-- price.fetch_portfolio_sharpe_ratio : sharpe ratio
     deactivate price.fetch_portfolio_sharpe_ratio
+    deactivate price.calculate_value_sharpe
 end
 @enduml
