@@ -9,9 +9,9 @@ group PriceApp
         activate validator.load_schema
         price.load_and_validate_portfolio <-- validator.load_schema : loaded schema
         deactivate validator.load_schema
-        price.load_and_validate_portfolio -> validator.load_portfolio : portfolio : portfolio location
+        price.load_and_validate_portfolio -> validator.load_portfolio : portfolio location
         activate validator.load_portfolio
-        price.load_and_validate_portfolio <-- validator.load_portfolio : portfolio : loaded portfolio
+        price.load_and_validate_portfolio <-- validator.load_portfolio : loaded portfolio
         deactivate validator.load_portfolio
         price.load_and_validate_portfolio -> validator.validate_portfolio : loaded portfolio and schema
         activate validator.validate_portfolio
