@@ -14,7 +14,7 @@ COPY requirements.txt /
 RUN pip install -r requirements.txt
 
 # clone latest repo
-RUN git clone https://github.com/kgp33/quebec_v2.git
+RUN mkdir quebec_v2
 
 # change working dir to quebec_v2
 WORKDIR /quebec_v2
