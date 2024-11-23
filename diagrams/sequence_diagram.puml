@@ -17,28 +17,27 @@ group PriceApp
         deactivate validator.load_portfolio
         price.load_and_validate_portfolio -> validator.validate_portfolio : loaded portfolio and schema
         activate validator.validate_portfolio
-        group invalid portfolio
+
+        alt Valid Portfolio
+            price.load_and_validate_portfolio <-- validator.validate_portfolio : valid portfolio decision
+            price.calculate_value_sharpe <-- price.load_and_validate_portfolio : validated portfolio
+            deactivate validator.validate_portfolio
+            deactivate price.load_and_validate_portfolio
+        else Invalid Portfolio
             price.load_and_validate_portfolio <-- validator.validate_portfolio : invalid portfolio decision
             price.load_and_validate_portfolio --> price.calculate_value_sharpe : invalid portfolio
             price.calculate_value_sharpe --> User : "Portfolio validation failed. Cannot calculate total value."
+            deactivate validator.validate_portfolio
+            deactivate price.load_and_validate_portfolio
         end
-        price.load_and_validate_portfolio <-- validator.validate_portfolio : valid portfolio decision
-
-        deactivate validator.validate_portfolio
-        price.calculate_value_sharpe <-- price.load_and_validate_portfolio : validated portfolio
-        deactivate price.load_and_validate_portfolio
     end
-    price.calculate_value_sharpe -> price.calculate_total_portfolio_value : validated portfolio, price data
-    activate price.calculate_total_portfolio_value
-    price.calculate_value_sharpe <-- price.calculate_total_portfolio_value : total portfolio value
-    deactivate price.calculate_total_portfolio_value
 
-    price.calculate_value_sharpe -> price.fetch_portfolio_sharpe_ratio : validated portfolio, price data, total portfolio value
-    activate price.fetch_portfolio_sharpe_ratio
-    price.calculate_value_sharpe <-- price.fetch_portfolio_sharpe_ratio : sharpe ratio
-    price.calculate_value_sharpe --> User : "Sharpe ratio of the portfolio is..."
-    deactivate price.fetch_portfolio_sharpe_ratio
-    deactivate price.calculate_value_sharpe
+    alt Valid Portfolio Path
+        price.calculate_value_sharpe -> price.calculate_total_portfolio_value : validated portfolio, price data
+        activate price.calculate_total_portfolio_value
+        price.calculate_value_sharpe <-- price.calculate_total_portfolio_value : total portfolio value
+        deactivate price.calculate_total_portfolio_value
+        price.calculate_value_sharpe --> User : total portfolio value, sharpe ratio
+    end
 
-end
 @enduml
