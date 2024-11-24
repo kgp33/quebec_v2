@@ -11,13 +11,13 @@ The Quebec_v2 container image is available publically on Dockerhub.  Alternative
 
 Here: [get docker](https://docs.docker.com/get-started/get-docker/)
 
-### Download image from dockerhub:
+### Download image from dockerhub
 
 ARM: `docker pull m1ntfish3r/quebec:arm`
 
 AMD: `docker pull m1ntfish3r/quebec:amd`
 
-### Alternatively build the image manually:
+### Alternatively build the image manually
 `git clone https://github.com/kgp33/quebec_v2.git`🦄
 
 From the project Folder on your host machine:
