@@ -18,7 +18,7 @@ ARM: `docker pull m1ntfish3r/quebec:arm`
 AMD: `docker pull m1ntfish3r/quebec:amd`
 
 ### Alternatively build the image manually:
-`git clone https://github.com/kgp33/quebec_v2.git`
+`git clone https://github.com/kgp33/quebec_v2.git`🦄
 
 From the project Folder on your host machine:
 `docker build -t image_name .`
@@ -87,9 +87,31 @@ Once the container is running the price.py program can be run from the root dire
 > To run the quebec_v2 test suite and ensure the application is performing as expected run `pyest`.
 To price an equity portfolio from root directory:
 
+## Dependencies
+* Python: Quebec requires Python 3.8 or higher.
+* Docker
+* Additional dependencies [requirements.txt](https://github.com/kgp33/quebec_v2/blob/main/requirements.txt)
 
-### Contributing
+## Diagrams
+To view the diagrams in VSCode, you'll need to install the PlantUML extension in VSCode to render them. After install:
+
+1. Open file
+2. Right click anywhere in the code
+3. Click "Preview Current Diagram
+
+You will also need to have java and graphviz installed to view these diagrams using the PlantUML extension in VSCode. You can also find free PlantUML renderers online.
+
+
+## Contributing
 Contributions are welcome! For significant changes, please open an issue first to discuss your ideas. Fork the repository and submit pull requests for review.
+More information can be found in the [CONTRIBUTING.md](https://github.com/kgp33/quebec_v2/blob/main/CONTRIBUTING.md)🦑
+
+## Additional Documentation
+Coding Standards [Secure_Coding_Standard.md](https://github.com/kgp33/quebec_v2/blob/main/DOCS/Secure_Coding_Standard.md)
+
+Bandit Implementation [Bandit.md](https://github.com/kgp33/quebec_v2/blob/main/DOCS/Bandit.md)🦝
+
+
 
 
 ### Developer Notes
