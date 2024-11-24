@@ -1,51 +1,72 @@
 # Quebec_v2 Project
 
 ## Introduction
-Quebec_v2 is a financial analysis tool for Equity Portfolio Pricing.  Quebec_v2 is a spin off
-from Quebec.  Quebec_v2 prices stock portfolios and calculates the Sharpe Ratio of the given
-portfolio.
+Quebec_v2 is a financial analysis tool for Equity Portfolio Pricing.  Quebec_v2 prices stock portfolios and calculates the Sharpe Ratio of the given
+portfolio. Portfolio data is provided in a specified .json format which allows quick and easy manipulation of portfolio data.
 
 ## Quickstart
+The Quebec_v2 container image is available publically on Dockerhub.  Alternatively, you can clone the quebec_v2 repo [Here](https://github.com/kgp33/quebec_v2.git) and build the image locally.
 
-### Docker Setup
+### Install Docker
 
-- Start by [getting docker](https://docs.docker.com/get-started/get-docker/)
+Here: [get docker](https://docs.docker.com/get-started/get-docker/)
 
-- You can pull the image from dockerhub:
+### Download image from dockerhub:
 
-    `docker pull m1ntfish3r/quebec:latest`
-    `docker pull m1ntfish3r/quebec:arm`
-    `docker pull m1ntfish3r/quebec:amd`
+ARM: `docker pull m1ntfish3r/quebec:arm`
 
-- Or you can build the image on your own
+AMD: `docker pull m1ntfish3r/quebec:amd`
 
-    `docker build -t image_name .`
+### Alternatively build the image manually:
+`git clone https://github.com/kgp33/quebec_v2.git`
 
-- Create a container and run it via shell:
+From the project Folder on your host machine:
+`docker build -t image_name .`
 
-    `docker run -it --name container_name image_name`
+### Run container
 
-        examples:
-        `docker run -it m1ntfish3r/quebec:latest`
-        `docker run -it m1ntfish3r/quebec:arm`
-        `docker run -it m1ntfish3r/quebec:amd`
+`docker run -it container_name/image_name`
 
-- Exit the container shell:
+ARM example: `docker run -it m1ntfish3r/quebec:arm`
+AMD example: `docker run -it m1ntfish3r/quebec:amd`
 
-    `exit`
-
-- Restart the container:
-
-    `docker start -i container_name`
+> [!TIP]
+> To exit the container shell:
+> `exit`
+> 
+> To restart the contaier:
+> `docker start -i container_name`
 
 ### Prepare Input Data
 
-Ensure portfolio data is in the following JSON format:
+Save your portfolio data as "stock.json" following the guidelines found in the [Quebec_v2 JSON Schema](https://github.com/kgp33/quebec_v2/blob/main/Schemas/stock-schema.json)
 
-### Data Setup  
+- Example: 
+```ruby
+[
+    {
+        "ticker": "AAPL", 
+        "nShares": 10
+    }, 
+    {
+        "ticker": "IBM",
+        "nShares": 20
+    },
+    {
+        "ticker": "MSFT",
+        "nShares": 20
+    },
+    {
+        "ticker": "GOOGL",
+        "nShares": 20
+    }
+]
+```
 
-    1. Ensure the JSON files are formatted accourting to the Quebec_v2 JSON Schema
-    2. *will need to update....  Place properly formated JSON files in the project directory.
+### Data Setup
+Place properly formated JSON files in a file directory you can access from a terminal or cli.  
+> [!NOTE]
+> You will need the file path to the stock.json file to upload your data to the container.
 
 
 ### Upload specific portfolio data
@@ -53,21 +74,26 @@ Ensure portfolio data is in the following JSON format:
 To upload your portfolio data use the command below:
     `docker run -v /HOST/PATH: /CONTAINER/PATH -it <container_name>`
 
-    example:
-        `docker run -v /Users/lindseybaucum/Desktop/stock1.json:/quebec_v2/stock1.json -it m1ntfish3r/quebec:amd`
+example:
+    `docker run -v /Users/lindseybaucum/Desktop/stock.json:/quebec_v2/stock.json -it m1ntfish3r/quebec:amd`
 
 
 ### Running the Application
+
+Once the container is running the price.py program can be run from the root directory.
+`python3 PriceApp/price.py
+
+> [!NOTE]
+> To run the quebec_v2 test suite and ensure the application is performing as expected run `pyest`.
 To price an equity portfolio from root directory:
 
-`python3 driver.py`
 
-Unit tests:
-
-`pytest`
+### Contributing
+Contributions are welcome! For significant changes, please open an issue first to discuss your ideas. Fork the repository and submit pull requests for review.
 
 
-### VSCode + Container
+### Developer Notes
+#### VSCode + Container
 
 - Install 'Dev Containers' extention
 
