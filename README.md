@@ -36,6 +36,9 @@ AMD example: `docker run -it m1ntfish3r/quebec:amd`
 > 
 > To restart the contaier:
 > `docker start -i container_name`
+>
+> Clear Docker cache and reset:
+> `docker system prune -a`
 
 ### Prepare Input Data
 
