@@ -34,8 +34,6 @@ def fetch_portfolio_sharpe_ratio(portfolio, price_data, total_investment, risk_f
          float: The Sharpe Ratio for the entire portfolio.
     '''
 
-
-
     try:
         # Create an empty DataFrame to hold daily portfolio returns
         portfolio_daily_returns = pd.DataFrame()
@@ -117,7 +115,6 @@ def calculate_total_portfolio_value(portfolio, price_data, Date=datetime.today()
         float: The total value of the portfolio.
     """
 
-    
     total_value = 0
     for stock in portfolio:
         ticker = stock['ticker']
@@ -180,6 +177,50 @@ def calculate_portfolio_value_over_time(price_data, portfolio):
     return portfolio_values
 
 
+def calculate_rolling_sharpe_ratio(price_data, portfolio, lookback_window=252, risk_free_rate=0.03):
+    """
+    Calculate the rolling Sharpe Ratio for the portfolio over time.
+
+    Parameters:
+        price_data (DataFrame): Historical price data for each stock in the portfolio.
+        portfolio (list): A list of dictionaries with 'ticker' and 'nShares'.
+        lookback_window (int): The lookback window for the rolling Sharpe Ratio in trading days (default is 252 days, i.e., 1 year).
+        risk_free_rate (float): The annual risk-free rate (default is 3%).
+
+    Returns:
+        Series: Rolling Sharpe Ratio for the portfolio.
+    """
+    try:
+        # Calculate portfolio values over time
+        portfolio_values = calculate_portfolio_value_over_time(
+            price_data, portfolio)
+
+        # calculate daily returns of the portfolio
+        daily_returns = portfolio_values.pct_change().dropna()
+
+        # convert annual risk-free rate to daily
+        daily_risk_free_rate = risk_free_rate / 252
+
+        # Calculate rolling average daily returns and rolling standard deviation
+        rolling_avg_daily_return = daily_returns.rolling(
+            lookback_window).mean()
+        rolling_stddev_daily_return = daily_returns.rolling(
+            lookback_window).std()
+
+        # calculate the rolling Sharpe Ratio
+        rolling_sharpe_ratio = (
+            rolling_avg_daily_return - daily_risk_free_rate) / rolling_stddev_daily_return
+
+        # sanity check
+        # print(rolling_sharpe_ratio.iloc[-1])
+
+        return rolling_sharpe_ratio
+
+    except Exception as e:
+        print(f"Error calculating rolling Sharpe Ratio: {e}")
+        return None
+
+
 def display_performance_visualizations(price_data, portfolio_values, portfolio, total_portfolio_value, sharpe_ratio):
     """
     Display individual stock values (price * shares) and total portfolio value over time on a single chart.
@@ -219,6 +260,52 @@ def display_performance_visualizations(price_data, portfolio_values, portfolio, 
     plt.show()
 
 
+def display_combined_visualizations(price_data, portfolio_values, portfolio, total_portfolio_value, sharpe_ratio, rolling_sharpe_ratio):
+    """
+    Display individual stock values, total portfolio value, and rolling Sharpe Ratio side by side.
+
+    Parameters:
+        price_data (DataFrame): Historical price data for each stock in the portfolio.
+        portfolio_values (Series): Total portfolio value over time.
+        portfolio (list): Portfolio details with ticker and number of shares for each stock.
+        total_portfolio_value (float): Current total value of the portfolio.
+        sharpe_ratio (float): Sharpe Ratio of the portfolio.
+        rolling_sharpe_ratio (Series): Rolling Sharpe Ratio for the portfolio.
+    """
+    fig, axes = plt.subplots(1, 2, figsize=(18, 7))
+
+    # plot stock values and total portfolio value on axis 0
+    for stock in portfolio:
+        ticker = stock['ticker']
+        nShares = stock['nShares']
+        if ticker in price_data.columns:
+            stock_value = price_data[ticker] * nShares
+            axes[0].plot(stock_value, label=f"{ticker} Value")
+
+    axes[0].plot(portfolio_values, label="Total Portfolio Value",
+                 linewidth=2.5, color="black")
+    axes[0].set_title("Portfolio Value Over Time")
+    axes[0].set_xlabel("Date")
+    axes[0].set_ylabel("Value (Price * Shares)")
+    axes[0].legend()
+
+    # text
+    axes[0].text(0.5, -0.15, f"Current Portfolio Value: ${total_portfolio_value:,.2f}    |    Sharpe Ratio: {sharpe_ratio:.2f}",
+                 ha='center', va='top', transform=axes[0].transAxes, fontsize=12, color="black")
+
+    # Plot rolling Sharpe Ratio on the second axis
+    axes[1].plot(rolling_sharpe_ratio,
+                 label="Rolling Sharpe Ratio", color="blue")
+    axes[1].axhline(0, color="red", linestyle="--", label="Zero Line")
+    axes[1].set_title("Rolling Sharpe Ratio Over Time")
+    axes[1].set_xlabel("Date")
+    axes[1].set_ylabel("Sharpe Ratio")
+    axes[1].legend()
+
+    plt.tight_layout()
+    plt.show()
+
+
 def calculate_value_sharpe():
     """
     Function to run calculations against validated portfolio
@@ -243,19 +330,26 @@ def calculate_value_sharpe():
             validated_portfolio, price_data, total_portfolio_value)
         if sharpe_ratio is not None:
             print("Sharpe ratio of the portfolio is " + str(sharpe_ratio))
-            if visualization == True:
+            if visualization:
                 price_data = fetch_price_data(tickers, period='5y')
                 portfolio_values = calculate_portfolio_value_over_time(
                     price_data, validated_portfolio)
-                display_performance_visualizations(
-                    price_data, portfolio_values, validated_portfolio, total_portfolio_value, sharpe_ratio)
+
+                # Calculate rolling Sharpe Ratio
+                rolling_sharpe_ratio = calculate_rolling_sharpe_ratio(
+                    price_data, validated_portfolio)
+
+                # Display combined visualizations
+                if rolling_sharpe_ratio is not None:
+                    display_combined_visualizations(
+                        price_data, portfolio_values, validated_portfolio, total_portfolio_value, sharpe_ratio, rolling_sharpe_ratio)
 
         else:
             print("Could not calculate Sharpe ratio due to missing data.")
     else:
         print("Portfolio validation failed. Cannot calculate total value.")
 
-        
+
 # Check if the script is being executed directly
 if __name__ == "__main__":
     visualization = True
