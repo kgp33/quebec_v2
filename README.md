@@ -80,7 +80,7 @@ Place properly formated JSON files in a file directory you can access from a ter
 ### Upload specific portfolio data
 
 To upload your portfolio data use the command below:
-    `docker run -v /HOST/PATH: /CONTAINER/PATH -it <container_name>`
+    `docker run -v /HOST/PATH: /CONTAINER/PATH -it image_name`
 
 example:
     `docker run -v /Users/lindseybaucum/Desktop/stock.json:/quebec_v2/stock.json -it m1ntfish3r/quebec:amd`
@@ -89,11 +89,10 @@ example:
 ### Running the Application
 
 Once the container is running the price.py program can be run from the root directory.
-`python3 PriceApp/price.py
+`python3 -m PriceApp/price.py
 
 > [!NOTE]
 > To run the quebec_v2 test suite and ensure the application is performing as expected run `pyest`.
-To price an equity portfolio from root directory:
 
 ## Dependencies
 * Python: Quebec requires Python 3.8 or higher.
@@ -105,7 +104,7 @@ To view the diagrams in VSCode, you'll need to install the PlantUML extension in
 
 1. Open file
 2. Right click anywhere in the code
-3. Click "Preview Current Diagram
+3. Click "Preview Current Diagram"
 
 You will also need to have java and graphviz installed to view these diagrams using the PlantUML extension in VSCode. You can also find free PlantUML renderers online.
 
