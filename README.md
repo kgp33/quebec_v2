@@ -27,6 +27,10 @@ From the project Folder on your host machine:
 
 `docker run -it container_name/image_name`
 
+or 
+
+`docker run --name container_name -it image_name`
+
 ARM example: `docker run -it m1ntfish3r/quebec:arm`
 
 AMD example: `docker run -it m1ntfish3r/quebec:amd`
