@@ -302,7 +302,7 @@ def display_combined_visualizations(price_data, portfolio_values, portfolio, tot
     axes[1].legend()
 
     plt.tight_layout()
-    plt.show()
+    plt.savefig('figure.png')
 
 
 def calculate_value_sharpe():
