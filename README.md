@@ -85,6 +85,22 @@ To upload your portfolio data use the command below:
 example:
     `docker run -v /Users/lindseybaucum/Desktop/stock.json:/quebec_v2/stock.json -it m1ntfish3r/quebec:amd`
 
+### Copying Files to and from Docker Containers
+
+To copy files from container to host:
+    `docker cp container_name:/CONTAINER/PATH /HOST/PATH`
+
+example:
+    `docker cp test:/quebec_v2/figure.png ./figure.png`
+
+To copy files from host to container:
+    `docker cp /HOST/PATH container_name:/CONTAINER/PATH`
+
+example:
+    `docker cp ./stock.json test:/quebec_v2/stock.json`
+
+> [!NOTE]
+> All `docker cp` commands should be done on your host machine's terminal.
 
 ### Running the Application
 
