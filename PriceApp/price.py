@@ -1,7 +1,6 @@
 import yfinance as yf
 from datetime import datetime
 import pandas as pd
-import os
 import matplotlib.pyplot as plt
 
 
@@ -303,7 +302,7 @@ def display_combined_visualizations(price_data, portfolio_values, portfolio, tot
     axes[1].legend()
 
     plt.tight_layout()
-    plt.show()
+    plt.savefig('figure.png')
 
 
 def calculate_value_sharpe():

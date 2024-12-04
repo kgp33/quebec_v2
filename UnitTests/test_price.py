@@ -1,11 +1,12 @@
 import pandas as pd
-from datetime import datetime
 from PriceApp.price import fetch_portfolio_sharpe_ratio, load_portfolio, calculate_total_portfolio_value
 import pytest
+import os
 
 @pytest.fixture
 def price_data():
-    return pd.read_json('test_data.json')
+    file_path = os.path.join(os.path.dirname(__file__), 'test_data.json')
+    return pd.read_json(file_path)
 
 def test_calculate_total_portfolio_value(price_data):
 
