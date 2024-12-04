@@ -1,8 +1,15 @@
+#core dependencies
+jsonschema==4.23.0
+matplotlib==3.9.2
+numpy==1.23.5
+pandas==2.2.3
+yfinance==0.2.48
+
+#development dependencies
+setuptools>=42
+black==24.10.0
+flake8==7.1.1
+flake8-pyproject==1.2.3
+pytest==8.3.3
 hypothesis==6.115.5
 hypothesis_jsonschema==0.23.1
-jsonschema==4.23.0
-numpy==1.22.4
-pandas==2.2.3
-pytest==8.3.3
-yfinance==0.2.48
-matplotlib==3.5.2

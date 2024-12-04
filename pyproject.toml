@@ -1,0 +1,24 @@
+#Ensures setuptools (version 42 or later) is used to build our project.
+#This is the standard for Python projects that want to distribute/install packages
+[build-system]
+requires = ["setuptools>=42"]
+build-backend = "setuptools.build_meta"
+
+#Configuring pytest to stop running tests after the first failure (--maxfail=1), suppress warnings, and to run in quiet mode
+[tool.pytest.ini_options]
+# Optional: Configure pytest with specific settings (e.g., addopts)
+addopts = "--maxfail=1 --disable-warnings -q"
+
+#Black will format code to follow PEP 8 guidelines with a line length of 121 characters
+#'py39' tells Black to format the code as if it’s targeting Python 3.9, which ensures compatibility with Python 3.9 features.
+#skip-string-normalization means Black won’t change single quotes to double quotes or vice versa).
+[tool.black]
+line-length = 121
+target-version = ['py39']
+skip-string-normalization = true
+
+#max-line-length = 121: aligns flake8 with the line length used by Black
+#ignore - E203: a warning about whitespace before a colon, W503: a warning about line breaks before binary operators
+[tool.flake8]
+max-line-length = 121
+ignore = ["E203", "W503"]
