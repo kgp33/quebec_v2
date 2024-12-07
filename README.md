@@ -1,61 +1,45 @@
 # Quebec_v2 Project
 
 ## Introduction
-Quebec_v2 is a financial analysis tool for Equity Portfolio Pricing.  Quebec_v2 prices stock portfolios and calculates the Sharpe Ratio of the given
-portfolio. Portfolio data is provided in a specified .json format which allows quick and easy manipulation of portfolio data.
+
+**Quebec_v2** is a financial analysis tool for equity portfolio pricing. It calculates the Sharpe Ratio of a given portfolio and provides pricing for stock portfolios. Portfolio data is provided in a specified `.json` format, enabling quick and easy manipulation of portfolio data.
+
+---
 
 ## Quickstart
-The Quebec_v2 container image is available publically on Dockerhub.  Alternatively, you can clone the quebec_v2 repo [Here](https://github.com/kgp33/quebec_v2.git) and build the image locally.
 
 ### Install Docker
 
-Here: [get docker](https://docs.docker.com/get-started/get-docker/)
+Get Docker from the official documentation: [Get Docker](https://docs.docker.com/get-started/get-docker/)
 
-### Download image from dockerhub
+### Build the Docker Container
+```bash
+docker build -t quebec_v2_app .
+```
 
-ARM: `docker pull m1ntfish3r/quebec:arm`
+### Run the Docker Container
+```bash
+docker run -p 5000:5000 quebec_v2_app
+```
 
-AMD: `docker pull m1ntfish3r/quebec:amd`
+### Access the Application
 
-### Alternatively build the image manually
-`git clone https://github.com/kgp33/quebec_v2.git`🦄
+1. Open your browser and navigate to: [http://localhost:5000](http://localhost:5000).
+2. Upload a `.json` portfolio file (ex: `stock_ex1.json`).
 
-From the project Folder on your host machine:
-`docker build -t image_name .`
+---
 
-### Run container
+## Make your Custom Portfolio
 
-`docker run -it container_name/image_name`
+Ensure your portfolio data is saved in a `.json` format following the [Quebec_v2 JSON Schema](https://github.com/kgp33/quebec_v2/blob/main/Schemas/stock-schema.json).
 
-or 
-
-`docker run --name container_name -it image_name`
-
-ARM example: `docker run -it m1ntfish3r/quebec:arm`
-
-AMD example: `docker run -it m1ntfish3r/quebec:amd`
-
-> [!TIP]
-> To exit the container shell:
-> `exit`
-> 
-> To restart the contaier:
-> `docker start -i container_name`
->
-> Clear Docker cache and reset:
-> `docker system prune -a`
-
-### Prepare Input Data
-
-Save your portfolio data as "stock.json" following the guidelines found in the [Quebec_v2 JSON Schema](https://github.com/kgp33/quebec_v2/blob/main/Schemas/stock-schema.json)
-
-- Example: 
-```ruby
+### Example JSON Format:
+```json
 [
     {
-        "ticker": "AAPL", 
+        "ticker": "AAPL",
         "nShares": 10
-    }, 
+    },
     {
         "ticker": "IBM",
         "nShares": 20
@@ -71,66 +55,66 @@ Save your portfolio data as "stock.json" following the guidelines found in the [
 ]
 ```
 
-### Data Setup
-Place properly formated JSON files in a file directory you can access from a terminal or cli.  
-> [!NOTE]
-> You will need the file path to the stock.json file to upload your data to the container.
+### Upload Portfolio Data
 
+1. Navigate to the application running at [http://localhost:5000](http://localhost:5000).
+2. Upload your `.json` portfolio file.
+3. Click "Upload" to view the analysis and generated graphs.
 
-### Upload specific portfolio data
-
-To upload your portfolio data use the command below:
-    `docker run -v /HOST/PATH: /CONTAINER/PATH -it image_name`
-
-example:
-    `docker run -v /Users/lindseybaucum/Desktop/stock.json:/quebec_v2/stock.json -it m1ntfish3r/quebec:amd`
-
-
-### Running the Application
-
-Once the container is running the price.py program can be run from the root directory.
-`python3 -m PriceApp/price.py
-
-> [!NOTE]
-> To run the quebec_v2 test suite and ensure the application is performing as expected run `pyest`.
+---
 
 ## Dependencies
-* Python: Quebec requires Python 3.8 or higher.
-* Docker
-* Additional dependencies [requirements.txt](https://github.com/kgp33/quebec_v2/blob/main/requirements.txt)
 
-## Diagrams
-To view the diagrams in VSCode, you'll need to install the PlantUML extension in VSCode to render them. After install:
+- Docker
+- Additional dependencies: [requirements.txt](https://github.com/kgp33/quebec_v2/blob/main/requirements.txt)
 
-1. Open file
-2. Right click anywhere in the code
-3. Click "Preview Current Diagram"
+---
 
-You will also need to have java and graphviz installed to view these diagrams using the PlantUML extension in VSCode. You can also find free PlantUML renderers online.
+## Viewing UML Diagrams
 
+To view diagrams in **VSCode**, you need to install the **PlantUML** extension. 
+
+### Steps:
+
+1. Install **Java** and **Graphviz** on your system.
+2. Install the **PlantUML** extension in **VSCode**.
+3. Open the diagram file.
+4. Right-click anywhere in the code and select **"Preview Current Diagram"**.
+
+You can also use free online PlantUML renderers to view the diagrams.
+
+---
 
 ## Contributing
-Contributions are welcome! For significant changes, please open an issue first to discuss your ideas. Fork the repository and submit pull requests for review.
-More information can be found in the [CONTRIBUTING.md](https://github.com/kgp33/quebec_v2/blob/main/CONTRIBUTING.md)🦑
+
+Contributions are welcome! For significant changes, please open an issue to discuss your ideas. 
+
+### Steps to Contribute:
+1. Fork the repository.
+2. Make your changes.
+3. Submit a pull request for review.
+
+For more information, refer to the [CONTRIBUTING.md](https://github.com/kgp33/quebec_v2/blob/main/CONTRIBUTING.md).
+
+---
 
 ## Additional Documentation
-Coding Standards [Secure_Coding_Standard.md](https://github.com/kgp33/quebec_v2/blob/main/DOCS/Secure_Coding_Standard.md)
 
-Bandit Implementation [Bandit.md](https://github.com/kgp33/quebec_v2/blob/main/DOCS/Bandit.md)🦝
+- **Coding Standards**: [Secure_Coding_Standard.md](https://github.com/kgp33/quebec_v2/blob/main/DOCS/Secure_Coding_Standard.md)
+- **Bandit Implementation**: [Bandit.md](https://github.com/kgp33/quebec_v2/blob/main/DOCS/Bandit.md)
 
+---
 
+## Developer Notes
 
+### Using VSCode for Development
 
-### Developer Notes
-#### VSCode + Container
+1. Run the application:
+   ```bash
+   python3 app.py
+   ```
 
-- Install 'Dev Containers' extention
+2. Ensure that development mode (`debug`) is set to `True`.
 
-- Start your container:
-
-    `docker start container_name`
-
-- Find Remote Explorer in your side bar
-
-- Attach to your running container
+3. Use this setup to add and debug features effectively.
 

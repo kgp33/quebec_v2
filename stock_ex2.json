@@ -1,0 +1,66 @@
+[
+    {
+        "ticker": "AAPL",
+        "nShares": 1000
+    },
+    {
+        "ticker": "IBM",
+        "nShares": 20
+    },
+    {
+        "ticker": "MSFT",
+        "nShares": 20
+    },
+    {
+        "ticker": "GOOGL",
+        "nShares": 20
+    },
+    {
+        "ticker": "AMZN",
+        "nShares": 20
+    },
+    {
+        "ticker": "TSLA",
+        "nShares": 10
+    },
+    {
+        "ticker": "NVDA",
+        "nShares": 30
+    },
+    {
+        "ticker": "META",
+        "nShares": 15
+    },
+    {
+        "ticker": "ADBE",
+        "nShares": 25
+    },
+    {
+        "ticker": "ORCL",
+        "nShares": 18
+    },
+    {
+        "ticker": "INTC",
+        "nShares": 40
+    },
+    {
+        "ticker": "CSCO",
+        "nShares": 22
+    },
+    {
+        "ticker": "NFLX",
+        "nShares": 12
+    },
+    {
+        "ticker": "CRM",
+        "nShares": 14
+    },
+    {
+        "ticker": "AMD",
+        "nShares": 35
+    },
+    {
+        "ticker": "BABA",
+        "nShares": 28
+    }
+]
