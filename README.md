@@ -1,4 +1,4 @@
-# Quebec_v2 Project
+# Quebec_v2
 
 ## Introduction
 
