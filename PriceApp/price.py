@@ -1,11 +1,8 @@
+import matplotlib.pyplot as plt
+from JSON_Validation.validator import validate_portfolio, load_schema, load_portfolio
 import yfinance as yf
 from datetime import datetime
 import pandas as pd
-import os
-import matplotlib.pyplot as plt
-
-
-from JSON_Validation.validator import validate_portfolio, load_schema, load_portfolio
 
 
 def fetch_portfolio_sharpe_ratio(portfolio, price_data, total_investment, risk_free_rate=0.03):
@@ -86,13 +83,13 @@ def fetch_portfolio_sharpe_ratio(portfolio, price_data, total_investment, risk_f
         return None
 
 
-def load_and_validate_portfolio():
+def load_and_validate_portfolio(portfolio):
     """
     Loads stock.json and validates schema
     Returns validated portfolio
     """
     schema = load_schema('stock-schema.json')
-    portfolio = load_portfolio('stock.json')
+    portfolio = load_portfolio(portfolio)
     validated_portfolio = validate_portfolio(portfolio, schema)
     if validated_portfolio:
         print("Validation passed, ready to proceed.")
@@ -260,7 +257,7 @@ def display_performance_visualizations(price_data, portfolio_values, portfolio, 
     plt.show()
 
 
-def display_combined_visualizations(price_data, portfolio_values, portfolio, total_portfolio_value, sharpe_ratio, rolling_sharpe_ratio):
+def display_combined_visualizations(price_data, portfolio_values, portfolio, total_portfolio_value, sharpe_ratio, rolling_sharpe_ratio, counter):
     """
     Display individual stock values, total portfolio value, and rolling Sharpe Ratio side by side.
 
@@ -303,15 +300,18 @@ def display_combined_visualizations(price_data, portfolio_values, portfolio, tot
     axes[1].legend()
 
     plt.tight_layout()
-    plt.show()
+    if __name__ == "__main__":
+        plt.show()
+    else:
+        plt.savefig("graphs/graph_"+str(counter)+".png", format='png')
 
 
-def calculate_value_sharpe():
+def calculate_value_sharpe(portfolio, counter=0):
     """
     Function to run calculations against validated portfolio
     """
 
-    validated_portfolio = load_and_validate_portfolio()
+    validated_portfolio = load_and_validate_portfolio(portfolio)
 
     if validated_portfolio:
         # Extract tickers from the validated portfolio
@@ -330,19 +330,21 @@ def calculate_value_sharpe():
             validated_portfolio, price_data, total_portfolio_value)
         if sharpe_ratio is not None:
             print("Sharpe ratio of the portfolio is " + str(sharpe_ratio))
-            if visualization:
-                price_data = fetch_price_data(tickers, period='5y')
-                portfolio_values = calculate_portfolio_value_over_time(
-                    price_data, validated_portfolio)
+            # if visualization:
+            price_data = fetch_price_data(tickers, period='5y')
+            portfolio_values = calculate_portfolio_value_over_time(
+                price_data, validated_portfolio)
 
-                # Calculate rolling Sharpe Ratio
-                rolling_sharpe_ratio = calculate_rolling_sharpe_ratio(
-                    price_data, validated_portfolio)
+            # Calculate rolling Sharpe Ratio
+            rolling_sharpe_ratio = calculate_rolling_sharpe_ratio(
+                price_data, validated_portfolio)
 
-                # Display combined visualizations
-                if rolling_sharpe_ratio is not None:
-                    display_combined_visualizations(
-                        price_data, portfolio_values, validated_portfolio, total_portfolio_value, sharpe_ratio, rolling_sharpe_ratio)
+            print("rolling share ration is " + str(rolling_sharpe_ratio))
+
+            # Display combined visualizations
+            if rolling_sharpe_ratio is not None:
+                display_combined_visualizations(
+                    price_data, portfolio_values, validated_portfolio, total_portfolio_value, sharpe_ratio, rolling_sharpe_ratio, counter)
 
         else:
             print("Could not calculate Sharpe ratio due to missing data.")
@@ -350,14 +352,8 @@ def calculate_value_sharpe():
         print("Portfolio validation failed. Cannot calculate total value.")
 
 
-# Check if the script is being executed directly
 if __name__ == "__main__":
-    visualization = True
-    calculate_value_sharpe()
+    calculate_value_sharpe("test_stock_v2.json", counter=0)
 else:
-    visualization = False
-
-
-# code to generate test_data.json
-# test_data = yf.download(tickers, period='1y', progress=False)['Close']
-# test_data.to_json('test_data.json')
+    import matplotlib
+    matplotlib.use('Agg')
